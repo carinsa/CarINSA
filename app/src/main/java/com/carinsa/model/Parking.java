@@ -1,4 +1,4 @@
-package model;
+package com.carinsa.model;
 
 public class Parking {
     private String name;
