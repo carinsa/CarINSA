@@ -29,5 +29,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-android
     implementation group: 'org.slf4j', name: 'slf4j-android', version: '1.7.7'
-
+    implementation 'com.android.volley:volley:1.1.1'
 }
