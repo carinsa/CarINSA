@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.SearchView;
 
@@ -28,12 +29,26 @@ public class MainActivity extends AppCompatActivity {
         //inflate and create the map
         setContentView(R.layout.activity_main);
         searchBar = findViewById(R.id.search_view);
-        searchBar.setOnClickListener(new View.OnClickListener() {
+        Log.e("1", "test");
+        searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onClick(View v) {
-                Intent searchActivity = new Intent(MainActivity.this, SearchActivity.class);
-                startActivity(searchActivity);
+            public boolean onQueryTextSubmit(String query) {
+                callSearch(query);
+                return true;
             }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+//              if (searchView.isExpanded() && TextUtils.isEmpty(newText)) {
+                callSearch(newText);
+//              }
+                return true;
+            }
+
+            private void callSearch(String query) {
+                Log.e("1", query);
+            }
+
         });
         //map = (MapView) findViewById(R.id.map);
         //map.setTileSource(TileSourceFactory.MAPNIK);
