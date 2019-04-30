@@ -1,8 +1,14 @@
 package com.carinsa.grandlyon;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.carinsa.model.*;
 import android.content.Context;
+import android.provider.SyncStateContract;
+import android.util.Base64;
 import android.util.Log;
+import android.util.Patterns;
 
 import com.android.volley.Cache;
 import com.android.volley.Network;
@@ -19,63 +25,153 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class GrandLyon {
     private Parking[] parkings;
     private Context ctx;
-    private boolean fetched=false;
+    private int fetched=-1;
     public GrandLyon(Context ctx){
         this.ctx=ctx;
     }
 
+    private static final String GL_USERNAME="";
+    private static final String GL_PASSWORD="";
+    private static final String GL_URL_PARK="https://download.data.grandlyon.com/ws/rdata/pvo_patrimoine_voirie.pvoparkingtr/all.json";
+    private static final String GL_URL_GEO="https://download.data.grandlyon.com/ws/rdata/pvo_patrimoine_voirie.pvoparkingtr/the_geom.json";
+
+    private RequestQueue requestQueue;
+    private JsonObjectRequest parkingReq = new JsonObjectRequest(Request.Method.GET, GL_URL_PARK, null, new Response.Listener<JSONObject>() {
+        @Override
+        public void onResponse(JSONObject response) {
+            Log.w("req1",response.toString());
+            try {
+                JSONArray values=response.getJSONArray("values");
+                parkings=new Parking[values.length()];
+                for (int i = 0; i < values.length(); i++) {
+                    JSONObject parking=values.getJSONObject(i);
+                    String name = parking.getString("nom");
+                    String state_str = parking.getString("etat_code");
+                    int state=-1;
+                    if(state_str.equals("1")){
+                        state=1;
+                    }
+                    else if(state_str.equals("2")){
+                        state=2;
+                    }
+                    else if(state_str.equals("3")) {
+                        state=3;
+                    }
+                    String available_str = parking.getString("etat");
+                    int available=-1;
+                    if(available_str.equals("Parking complet")){
+                        available=0;
+                    }
+                    else {
+                        Pattern pattern = Pattern.compile("([0-9]+) places? libres?");
+                        Matcher matcher = pattern.matcher(available_str);
+                        if(matcher.matches()){
+                            available=Integer.parseInt(matcher.group(1));
+                        }
+                    }
+                    Parking park = new Parking(name,0,0,state,available);
+                    parkings[i]=park;
+
+
+                }
+                fetched=2;
+                requestQueue.add(geomReq);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    //Failure Callback
+                }
+            })
+
+    {
+        @Override
+        public Map getHeaders() {
+            Map<String, String> params = new HashMap<String, String>();
+            String creds = String.format("%s:%s",GL_USERNAME,GL_PASSWORD);
+            String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.NO_WRAP);
+            params.put("Authorization", auth);
+            return params;
+        }
+    };
+    private JsonObjectRequest geomReq = new JsonObjectRequest(Request.Method.GET, GL_URL_GEO, null, new Response.Listener<JSONObject>() {
+        @Override
+        public void onResponse(JSONObject response) {
+            Log.w("req1",response.toString());
+            try {
+                JSONArray values=response.getJSONArray("values");
+                for (int i = 0; i < values.length(); i++) {
+                    String coord = values.getString(i);
+                    Pattern pattern = Pattern.compile("MULTIPOINT\\(([0-9]+\\.[0-9]+) ([0-9]+\\.[0-9]+)\\)");
+                    Matcher matcher = pattern.matcher(coord);
+                    double lat=0;
+                    double lng=0;
+                    if(matcher.matches()){
+                        lat=Double.parseDouble(matcher.group(2));
+                        lng=Double.parseDouble(matcher.group(1));
+                    }
+                    parkings[i].setLat(lat);
+                    parkings[i].setLng(lng);
+                }
+                fetched=1;
+                for (int i = 0; i < parkings.length; i++) {
+                    Log.w("el",parkings[i].toString());
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    //Failure Callback
+                }
+            })
+
+    {
+        @Override
+        public Map getHeaders() {
+            Map<String, String> params = new HashMap<String, String>();
+            String creds = String.format("%s:%s",GL_USERNAME,GL_PASSWORD);
+            String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.NO_WRAP);
+            params.put("Authorization", auth);
+            return params;
+        }
+    };
+
     public void fetchParkings( ){
-        fetched=false;
+        fetched=0;
         parkings=new Parking[0];
-        RequestQueue requestQueue;
         Cache cache = new DiskBasedCache(ctx.getCacheDir(), 1024 * 1024);
         Network network = new BasicNetwork(new HurlStack());
         requestQueue = new RequestQueue(cache, network);
         requestQueue.start();
 
-        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest
-                //TO DO:
-                (Request.Method.GET, "http://10.43.2.67/DEV/parkings/json.php", null, new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        parkings=new Parking[response.length()];
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-                                JSONObject jsonobject = response.getJSONObject(i);
-                                String name = jsonobject.getString("name");
-                                Double lat = jsonobject.getDouble("lat");
-                                Double lng = jsonobject.getDouble("lng");
-                                int state = jsonobject.getInt("state");
-                                int available = jsonobject.getInt("available");
-                                Parking park = new Parking(name,lat,lng,state,available);
-                                parkings[i]=park;
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        Log.d("http",response.toString());
-                        fetched=true;
-                    }
 
-                    /*@Override
-                    public void onResponse(JSONObject response) {
-                        //textView.setText("Response: " + response.toString());
-                        parkings=new Parking[12];
-                        Log.d("http",response.toString());
-                    }*/
-                }, new Response.ErrorListener() {
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                        Log.e("http",error.toString());
 
-                    }
-                });
-        requestQueue.add(jsonObjectRequest);
+
+        requestQueue.add(parkingReq);
+
+    }
+    public int fetchStatus(){
+        return fetched;
     }
     public Parking[] getAllParkings(){
         return parkings;
@@ -109,7 +205,7 @@ public class GrandLyon {
         return minPark;
 
     }
-    public static double distance(double lat1, double lng1, double lat2, double lng2) {
+    private static double distance(double lat1, double lng1, double lat2, double lng2) {
         final int R = 6371; // Radius of the earth
         double latDistance = Math.toRadians(lat2 - lat1);
         double lonDistance = Math.toRadians(lng2 - lng1);
