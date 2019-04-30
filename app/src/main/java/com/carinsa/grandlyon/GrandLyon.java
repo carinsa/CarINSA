@@ -189,7 +189,7 @@ public class GrandLyon {
         for(int i=0;i<size;i++){
             park_ret[i]=park_temp[i];
         }
-        return park_temp;
+        return park_ret;
 
     }
     public Parking getClosestAvailableParking(double lat, double lng, int radius){
