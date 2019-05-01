@@ -4,6 +4,7 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.carinsa.model.*;
+
 import android.content.Context;
 import android.provider.SyncStateContract;
 import android.util.Base64;
@@ -33,56 +34,54 @@ import java.util.regex.Pattern;
 public class GrandLyon {
     private Parking[] parkings;
     private Context ctx;
-    private int fetched=-1;
-    public GrandLyon(Context ctx){
-        this.ctx=ctx;
+    private int fetched = -1;
+
+    public GrandLyon(Context ctx) {
+        this.ctx = ctx;
     }
 
-    private static final String GL_USERNAME="";
-    private static final String GL_PASSWORD="";
-    private static final String GL_URL_PARK="https://download.data.grandlyon.com/ws/rdata/pvo_patrimoine_voirie.pvoparkingtr/all.json";
-    private static final String GL_URL_GEO="https://download.data.grandlyon.com/ws/rdata/pvo_patrimoine_voirie.pvoparkingtr/the_geom.json";
+    private static final String GL_USERNAME = "alexandre.van-beurden@insa-lyon.fr";
+    private static final String GL_PASSWORD = "";  //alex's secret garden
+    private static final String GL_URL_PARK = "https://download.data.grandlyon.com/ws/rdata/pvo_patrimoine_voirie.pvoparkingtr/all.json";
+    private static final String GL_URL_GEO = "https://download.data.grandlyon.com/ws/rdata/pvo_patrimoine_voirie.pvoparkingtr/the_geom.json";
 
     private RequestQueue requestQueue;
     private JsonObjectRequest parkingReq = new JsonObjectRequest(Request.Method.GET, GL_URL_PARK, null, new Response.Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject response) {
-            Log.w("req1",response.toString());
+            Log.w("req1", response.toString());
             try {
-                JSONArray values=response.getJSONArray("values");
-                parkings=new Parking[values.length()];
+                JSONArray values = response.getJSONArray("values");
+                parkings = new Parking[values.length()];
                 for (int i = 0; i < values.length(); i++) {
-                    JSONObject parking=values.getJSONObject(i);
+                    JSONObject parking = values.getJSONObject(i);
                     String name = parking.getString("nom");
                     String state_str = parking.getString("etat_code");
-                    int state=-1;
-                    if(state_str.equals("1")){
-                        state=1;
-                    }
-                    else if(state_str.equals("2")){
-                        state=2;
-                    }
-                    else if(state_str.equals("3")) {
-                        state=3;
+                    int state = -1;
+                    if (state_str.equals("1")) {
+                        state = 1;
+                    } else if (state_str.equals("2")) {
+                        state = 2;
+                    } else if (state_str.equals("3")) {
+                        state = 3;
                     }
                     String available_str = parking.getString("etat");
-                    int available=-1;
-                    if(available_str.equals("Parking complet")){
-                        available=0;
-                    }
-                    else {
+                    int available = -1;
+                    if (available_str.equals("Parking complet")) {
+                        available = 0;
+                    } else {
                         Pattern pattern = Pattern.compile("([0-9]+) places? libres?");
                         Matcher matcher = pattern.matcher(available_str);
-                        if(matcher.matches()){
-                            available=Integer.parseInt(matcher.group(1));
+                        if (matcher.matches()) {
+                            available = Integer.parseInt(matcher.group(1));
                         }
                     }
-                    Parking park = new Parking(name,0,0,state,available);
-                    parkings[i]=park;
+                    Parking park = new Parking(name, 0, 0, state, available);
+                    parkings[i] = park;
 
 
                 }
-                fetched=2;
+                fetched = 2;
                 requestQueue.add(geomReq);
 
             } catch (JSONException e) {
@@ -96,13 +95,11 @@ public class GrandLyon {
 
                     //Failure Callback
                 }
-            })
-
-    {
+            }) {
         @Override
         public Map getHeaders() {
             Map<String, String> params = new HashMap<String, String>();
-            String creds = String.format("%s:%s",GL_USERNAME,GL_PASSWORD);
+            String creds = String.format("%s:%s", GL_USERNAME, GL_PASSWORD);
             String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.NO_WRAP);
             params.put("Authorization", auth);
             return params;
@@ -111,25 +108,25 @@ public class GrandLyon {
     private JsonObjectRequest geomReq = new JsonObjectRequest(Request.Method.GET, GL_URL_GEO, null, new Response.Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject response) {
-            Log.w("req1",response.toString());
+            Log.w("req1", response.toString());
             try {
-                JSONArray values=response.getJSONArray("values");
+                JSONArray values = response.getJSONArray("values");
                 for (int i = 0; i < values.length(); i++) {
                     String coord = values.getString(i);
                     Pattern pattern = Pattern.compile("MULTIPOINT\\(([0-9]+\\.[0-9]+) ([0-9]+\\.[0-9]+)\\)");
                     Matcher matcher = pattern.matcher(coord);
-                    double lat=0;
-                    double lng=0;
-                    if(matcher.matches()){
-                        lat=Double.parseDouble(matcher.group(2));
-                        lng=Double.parseDouble(matcher.group(1));
+                    double lat = 0;
+                    double lng = 0;
+                    if (matcher.matches()) {
+                        lat = Double.parseDouble(matcher.group(2));
+                        lng = Double.parseDouble(matcher.group(1));
                     }
                     parkings[i].setLat(lat);
                     parkings[i].setLng(lng);
                 }
-                fetched=1;
+                fetched = 1;
                 for (int i = 0; i < parkings.length; i++) {
-                    Log.w("el",parkings[i].toString());
+                    Log.w("el", parkings[i].toString());
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -142,74 +139,74 @@ public class GrandLyon {
 
                     //Failure Callback
                 }
-            })
-
-    {
+            }) {
         @Override
         public Map getHeaders() {
             Map<String, String> params = new HashMap<String, String>();
-            String creds = String.format("%s:%s",GL_USERNAME,GL_PASSWORD);
+            String creds = String.format("%s:%s", GL_USERNAME, GL_PASSWORD);
             String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.NO_WRAP);
             params.put("Authorization", auth);
             return params;
         }
     };
 
-    public void fetchParkings( ){
-        fetched=0;
-        parkings=new Parking[0];
+    public void fetchParkings() {
+        fetched = 0;
+        parkings = new Parking[0];
         Cache cache = new DiskBasedCache(ctx.getCacheDir(), 1024 * 1024);
         Network network = new BasicNetwork(new HurlStack());
         requestQueue = new RequestQueue(cache, network);
         requestQueue.start();
 
 
-
-
-
         requestQueue.add(parkingReq);
 
     }
-    public int fetchStatus(){
+
+    public int fetchStatus() {
         return fetched;
     }
-    public Parking[] getAllParkings(){
+
+    public Parking[] getAllParkings() {
         return parkings;
     }
-    public Parking[] getParkings(double lat, double lng, int radius){
+
+    public Parking[] getParkings(double lat, double lng, int radius) {
         Parking[] park_temp = new Parking[parkings.length];
-        int size=0;
-        for(int i=0;i<parkings.length;i++){
-            if(distance(lat,lng,parkings[i].getLat(),parkings[i].getLng())<=radius){
-                park_temp[size]=parkings[i];
+        int size = 0;
+        for (int i = 0; i < parkings.length; i++) {
+            if (distance(lat, lng, parkings[i].getLat(), parkings[i].getLng()) <= radius) {
+                park_temp[size] = parkings[i];
                 size++;
             }
         }
-        Parking[] park_ret=new Parking[size];
-        for(int i=0;i<size;i++){
-            park_ret[i]=park_temp[i];
+        Parking[] park_ret = new Parking[size];
+        for (int i = 0; i < size; i++) {
+            park_ret[i] = park_temp[i];
         }
         return park_ret;
 
     }
-    public Parking getClosestAvailableParking(double lat, double lng, int radius){
-        Parking minPark=null;
-        double minDist=100000;
-        for(int i=0;i<parkings.length;i++){
-            double dist=distance(lat,lng,parkings[i].getLat(),parkings[i].getLng());
-            if(parkings[i].getAvailableSpots()>0 && dist<=radius && dist<minDist){
-                minDist=dist;
-                minPark=parkings[i];
+
+    public Parking getClosestAvailableParking(double lat, double lng, int radius) {
+        Parking minPark = null;
+        double minDist = 100000;
+        for (int i = 0; i < parkings.length; i++) {
+            double dist = distance(lat, lng, parkings[i].getLat(), parkings[i].getLng());
+            if (parkings[i].getAvailableSpots() > 0 && dist <= radius && dist < minDist) {
+                minDist = dist;
+                minPark = parkings[i];
             }
         }
         return minPark;
 
     }
+
     private static double distance(double lat1, double lng1, double lat2, double lng2) {
         final int R = 6371; // Radius of the earth
         double latDistance = Math.toRadians(lat2 - lat1);
         double lonDistance = Math.toRadians(lng2 - lng1);
-        double a = Math.sin(latDistance/2)*Math.sin(latDistance/2)+Math.cos(Math.toRadians(lat1))*Math.cos(Math.toRadians(lat2))*Math.sin(lonDistance/2)*Math.sin(lonDistance/2);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distance = R * c * 1000;
         distance = Math.pow(distance, 2);
