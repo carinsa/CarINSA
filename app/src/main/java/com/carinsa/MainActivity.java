@@ -1,4 +1,5 @@
 package com.carinsa;
+import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.Manifest;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.carinsa.grandlyon.GrandLyon;
@@ -40,6 +42,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
     private AutoCompleteTextView searchBar;
     private MapView map = null;
     private MyItemizedOverlay myItemizedOverlay = null;
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private FusedLocationProviderClient mFusedLocationClient;
+    private FloatingActionButton fab;
 
     private static final int MULTIPLE_PERMISSION_REQUEST_CODE = 4;
     private final Handler handler = new Handler();
@@ -120,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void setupMap() {
-
+        fab = findViewById(R.id.fab);
         map = findViewById(R.id.map);
         map.setClickable(true);
 
@@ -187,6 +191,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         grandlyon = new GrandLyon(this);
         grandlyon.fetchParkings();
 
+        //click effect for fab
+        fab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                setCenterInMyCurrentLocation();
+            }
+        });
 
         handler.postDelayed(new Runnable() {
             @Override
@@ -257,24 +267,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//
-//        if (id == R.id.action_settings) {
-//            return true;
-//        } else if (id == R.id.action_locate) {
-//            setCenterInMyCurrentLocation();
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 
     public void onResume(){
         super.onResume();
@@ -328,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         final AutoCompleteTextView autoComplete = (AutoCompleteTextView) findViewById(R.id.search_view);
 
         //On récupère le bouton que l'on a créé dans le fichier main.xml
-        Button boutonRecherche = (Button) findViewById(R.id.ButtonEnvoyer);
+        ImageButton boutonRecherche = (ImageButton) findViewById(R.id.ButtonEnvoyer);
 
         //On crée la liste d'autocomplétion à partir de notre tableau de string appelé tableauString
         //android.R.layout.simple_dropdown_item_1line permet de définir le style d'affichage de la liste
