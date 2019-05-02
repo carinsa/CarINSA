@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private static final int MULTIPLE_PERMISSION_REQUEST_CODE = 4;
     private final Handler handler = new Handler();
 
+    private ArrayList<Marker> markers=new ArrayList<Marker>();
 
     @Override public void onCreate(Bundle savedInstanceState) {
 
@@ -217,27 +218,36 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if(grandlyon.fetchStatus()!=1){
                     handler.postDelayed(this, 100);
                 }else{
-                    Parking p = grandlyon.getClosestAvailableParking(45.75,4.85,5000);
-                    addMarker(p.getLat(),p.getLng());
+                    Parking[] p = grandlyon.getAllParkings();
+                    for(int i=0;i<p.length;i++) {
+                        addMarker(p[i]);
+                    }
                 }
             }
         }, 500); // first trigger 3000ms. asynchrone!!
     }
 
-    protected void addMarker(double lat, double lon){
-        GeoPoint parkingGeo = new GeoPoint(lat, lon);
+    protected void addMarker(Parking p){
+        for(int i=0;i<markers.size();i++) {
+            if(markers.get(i).getRelatedObject().toString().equals(p.toString())){
+                return;
+            }
+        }
+        GeoPoint parkingGeo = new GeoPoint(p.getLat(),p.getLng());
         Marker parkingMarker = new Marker(map);
 
         parkingMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener(){
                 @Override
                 public boolean onMarkerClick(Marker marker,
                                       MapView mapView){
-                    Log.e("tap","TAP");
+                    Log.e("tap", marker.getRelatedObject().toString());
                     return true;
                 }
           });
         parkingMarker.setPosition(parkingGeo);
+        parkingMarker.setRelatedObject(p);
         map.getOverlays().add(parkingMarker);
+        markers.add(parkingMarker);
     }
     protected void onStart() {
         mGoogleApiClient.connect();
@@ -352,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 double[] coords= getLocationFromAddress(autoComplete.getText().toString());
                 if (coords != null){
                     Parking p = grandlyon.getClosestAvailableParking(coords[0],coords[1],5000);
-                    addMarker(p.getLat(),p.getLng());
+                    addMarker(p);
                     map.getController().setCenter(new GeoPoint(p.getLat(),p.getLng()));
                     IMapController mapController = map.getController();
                     mapController.setZoom(15);
