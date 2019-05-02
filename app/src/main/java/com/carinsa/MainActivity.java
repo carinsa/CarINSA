@@ -1,4 +1,7 @@
 package com.carinsa;
+import android.content.res.AssetManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -38,6 +41,14 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
@@ -132,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         map.setMultiTouchControls(true);
 
         IMapController mapController = map.getController();
-        mapController.setZoom(9.5);
+        mapController.setZoom(15);
 
         Drawable marker;
         /* marker star for future use*/
@@ -162,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
             public boolean onQueryTextChange(String newText) {
-                callSearch(newText);
+                //callSearch(newText);
                 return true;
             }
 
@@ -311,10 +322,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void setupSearchBar(Bundle savedInstanceState) {
-
+        try {
+            grandlyon.serialyzeAdresses(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         //On récupère le tableau de String créé dans le fichier string.xml
-        String[] tableauString = getResources().getStringArray(R.array.tableau);
+        String[] tableauString = grandlyon.getAdresses();
 
         //On récupère l'AutoCompleteTextView que l'on a créé dans le fichier main.xml
         final AutoCompleteTextView autoComplete = (AutoCompleteTextView) findViewById(R.id.search_view);
@@ -334,10 +349,42 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         boutonRecherche.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, autoComplete.getText(), LENGTH_SHORT).show();
+                double[] coords= getLocationFromAddress(autoComplete.getText().toString());
+                if (coords != null){
+                    Parking p = grandlyon.getClosestAvailableParking(coords[0],coords[1],5000);
+                    addMarker(p.getLat(),p.getLng());
+                    map.getController().setCenter(new GeoPoint(p.getLat(),p.getLng()));
+                    IMapController mapController = map.getController();
+                    mapController.setZoom(15);
+                    Toast.makeText(MainActivity.this, autoComplete.getText(), LENGTH_SHORT).show();
+                }else{
+                     //TODO
+                }
             }
         });
+    }
 
+    public double[] getLocationFromAddress(String strAddress){
 
+        Geocoder coder = new Geocoder(this);
+        List<Address> address;
+        GeoPoint p1 = null;
+        double[] res = new double[2];
+
+        try {
+            address = coder.getFromLocationName(strAddress,5);
+            if (address==null) {
+                return null;
+            }
+            Address location=address.get(0);
+
+            res[0]=location.getLatitude();
+            res[1]=location.getLongitude();
+
+            return res;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

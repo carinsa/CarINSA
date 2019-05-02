@@ -6,6 +6,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.carinsa.model.*;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.provider.SyncStateContract;
 import android.util.Base64;
 import android.util.Log;
@@ -26,12 +27,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GrandLyon {
+    private static List<String> adresses = new ArrayList<>();
     private Parking[] parkings;
     private Context ctx;
     private int fetched = -1;
@@ -98,7 +107,7 @@ public class GrandLyon {
             }) {
         @Override
         public Map getHeaders() {
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new HashMap<>();
             String creds = String.format("%s:%s", GL_USERNAME, GL_PASSWORD);
             String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.NO_WRAP);
             params.put("Authorization", auth);
@@ -142,7 +151,7 @@ public class GrandLyon {
             }) {
         @Override
         public Map getHeaders() {
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new HashMap<>();
             String creds = String.format("%s:%s", GL_USERNAME, GL_PASSWORD);
             String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.NO_WRAP);
             params.put("Authorization", auth);
@@ -211,5 +220,23 @@ public class GrandLyon {
         double distance = R * c * 1000;
         distance = Math.pow(distance, 2);
         return Math.sqrt(distance);
+    }
+
+    public void serialyzeAdresses(Context ctx) throws IOException {
+        AssetManager am = ctx.getAssets();
+        InputStream is = am.open("csv/ruesLyon.csv");
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] values = line.split(";");
+            if(values.length >3) adresses.add(values[1] + " " + values[3]);
+        }
+        Log.e("nombre d'adresses", Integer.toString(adresses.size()));
+    }
+
+    public String[] getAdresses() {
+        String[] res = new String[adresses.size()];
+        System.arraycopy(adresses.toArray(), 0, res, 0, adresses.size());
+        return res;
     }
 }
