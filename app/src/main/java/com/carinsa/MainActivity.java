@@ -1,5 +1,6 @@
 package com.carinsa;
-
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -16,6 +17,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.carinsa.grandlyon.GrandLyon;
@@ -35,7 +39,10 @@ import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import static android.widget.Toast.LENGTH_SHORT;
+
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    private AutoCompleteTextView searchBar;
     private MapView map = null;
     private MyItemizedOverlay myItemizedOverlay = null;
     private MyLocationNewOverlay myLocationOverlay = null;
@@ -76,6 +83,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
 
         checkPermissionsState();
+
+        onCreate2(savedInstanceState);
+
 
     }
 
@@ -121,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void setupMap() {
+
         map = findViewById(R.id.map);
         map.setClickable(true);
 
@@ -146,7 +157,37 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         GeoPoint myPoint1 = new GeoPoint(0.0, 0.0);
         myItemizedOverlay.addItem(myPoint1, "myPoint1", "myPoint1");
 
+        searchBar = findViewById(R.id.search_view);
+        Log.e("1", "test");
+        searchBar.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //finish();
+            }
 
+            public boolean onQueryTextSubmit(String query) {
+                callSearch(query);
+                return true;
+            }
+
+
+            public boolean onQueryTextChange(String newText) {
+//              if (searchView.isExpanded() && TextUtils.isEmpty(newText)) {
+                callSearch(newText);
+//              }
+                return true;
+            }
+
+
+            private void callSearch(String query) {
+                Log.e("1", query);
+            }
+        });
+
+
+
+        //map = (MapView) findViewById(R.id.map);
+        //map.setTileSource(TileSourceFactory.MAPNIK);
 
         //marker starter
         Marker startMarker = new Marker(map);
@@ -199,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (mLastLocation != null) {
             map.getController().setCenter(new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
         } else {
-            Toast.makeText(this, "Getting current location", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Getting current location", LENGTH_SHORT).show();
         }
     }
 
@@ -223,24 +264,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == R.id.action_locate) {
-            setCenterInMyCurrentLocation();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//
+//        if (id == R.id.action_settings) {
+//            return true;
+//        } else if (id == R.id.action_locate) {
+//            setCenterInMyCurrentLocation();
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     public void onResume(){
         super.onResume();
@@ -281,6 +323,38 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    public void onCreate2(Bundle savedInstanceState) {
+
+
+        //On récupère le tableau de String créé dans le fichier string.xml
+        String[] tableauString = getResources().getStringArray(R.array.tableau);
+
+        //On récupère l'AutoCompleteTextView que l'on a créé dans le fichier main.xml
+        final AutoCompleteTextView autoComplete = (AutoCompleteTextView) findViewById(R.id.search_view);
+
+        //On récupère le bouton que l'on a créé dans le fichier main.xml
+        Button boutonRecherche = (Button) findViewById(R.id.ButtonEnvoyer);
+
+        //On crée la liste d'autocomplétion à partir de notre tableau de string appelé tableauString
+        //android.R.layout.simple_dropdown_item_1line permet de définir le style d'affichage de la liste
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, tableauString);
+
+        //On affecte cette liste d'autocomplétion à notre objet d'autocomplétion
+        autoComplete.setAdapter(adapter);
+
+        //Enfin on rajoute un petit écouteur d'évènement sur le bouton pour afficher
+        //dans un Toast ce que l'on a rentré dans notre AutoCompleteTextView
+
+        boutonRecherche.setOnClickListener(new OnClickListener() {
+
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, autoComplete.getText(), LENGTH_SHORT).show();
+            }
+        });
+
 
     }
 }
