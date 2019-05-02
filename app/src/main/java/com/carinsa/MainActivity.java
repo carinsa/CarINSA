@@ -10,19 +10,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.carinsa.grandlyon.GrandLyon;
+import com.carinsa.model.Parking;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -60,18 +58,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //handle permissions first, before map is created. not depicted here
-
-        //load/initialize the osmdroid configuration, this can be done
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-        //setting this before the layout is inflated is a good idea
-        //it 'should' ensure that the map has a writable location for the map cache, even without permissions
-        //if no tiles are displayed, you can try overriding the cache path using Configuration.getInstance().setCachePath
-        //see also StorageUtils
-        //note, the load method also sets the HTTP User Agent to your application's package name, abusing osm's tile servers will get you banned based on this string
 
-        //inflate and create the map
          mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         if (mGoogleApiClient == null) {
@@ -84,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         checkPermissionsState();
 
-        onCreate2(savedInstanceState);
+        setupSearchBar(savedInstanceState);
 
 
     }
@@ -140,8 +129,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         IMapController mapController = map.getController();
         mapController.setZoom(9.5);
-        GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
-//        mapController.setCenter(startPoint);
 
         Drawable marker;
         /* marker star for future use*/
@@ -162,7 +149,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         searchBar.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                //finish();
             }
 
             public boolean onQueryTextSubmit(String query) {
@@ -172,9 +158,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
             public boolean onQueryTextChange(String newText) {
-//              if (searchView.isExpanded() && TextUtils.isEmpty(newText)) {
                 callSearch(newText);
-//              }
                 return true;
             }
 
@@ -184,17 +168,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
-
-
-        //map = (MapView) findViewById(R.id.map);
-        //map.setTileSource(TileSourceFactory.MAPNIK);
-
         //marker starter
+        GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
         Marker startMarker = new Marker(map);
         startMarker.setPosition(startPoint);
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);// position the marker in center
+        //startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);// position the marker in center
         map.getOverlays().add(startMarker);
-
         CompassOverlay compassOverlay = new CompassOverlay(this, map);
         compassOverlay.enableCompass();
         map.getOverlays().add(compassOverlay);
@@ -217,15 +196,28 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if(grandlyon.fetchStatus()!=1){
                     handler.postDelayed(this, 100);
                 }else{
-                    Log.d("hy",grandlyon.getClosestAvailableParking(45.75,4.85,5000).getName());
+                    Parking p = grandlyon.getClosestAvailableParking(45.75,4.85,5000);
+                    addMarker(p.getLat(),p.getLng());
                 }
-
             }
         }, 500); // first trigger 3000ms. asynchrone!!
-
-
     }
 
+    protected void addMarker(double lat, double lon){
+        GeoPoint parkingGeo = new GeoPoint(lat, lon);
+        Marker parkingMarker = new Marker(map);
+
+        parkingMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener(){
+                @Override
+                public boolean onMarkerClick(Marker marker,
+                                      MapView mapView){
+                    Log.e("tap","TAP");
+                    return true;
+                }
+          });
+        parkingMarker.setPosition(parkingGeo);
+        map.getOverlays().add(parkingMarker);
+    }
     protected void onStart() {
         mGoogleApiClient.connect();
         super.onStart();
@@ -326,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
-    public void onCreate2(Bundle savedInstanceState) {
+    public void setupSearchBar(Bundle savedInstanceState) {
 
 
         //On récupère le tableau de String créé dans le fichier string.xml
@@ -347,7 +339,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         //Enfin on rajoute un petit écouteur d'évènement sur le bouton pour afficher
         //dans un Toast ce que l'on a rentré dans notre AutoCompleteTextView
-
         boutonRecherche.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
