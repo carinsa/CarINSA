@@ -41,7 +41,7 @@ public class GrandLyon {
     }
 
     private static final String GL_USERNAME = "alexandre.van-beurden@insa-lyon.fr";
-    private static final String GL_PASSWORD = "";  //alex's secret garden
+    private static final String GL_PASSWORD = "7os9E5+2sPJ7FdWdpDqcxlD9k";  //alex's secret garden
     private static final String GL_URL_PARK = "https://download.data.grandlyon.com/ws/rdata/pvo_patrimoine_voirie.pvoparkingtr/all.json";
     private static final String GL_URL_GEO = "https://download.data.grandlyon.com/ws/rdata/pvo_patrimoine_voirie.pvoparkingtr/the_geom.json";
 
