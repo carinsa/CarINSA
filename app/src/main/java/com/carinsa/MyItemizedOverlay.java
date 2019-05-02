@@ -2,13 +2,19 @@ package com.carinsa;
 
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.widget.Toast;
 
 import org.osmdroid.api.IMapView;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import java.util.ArrayList;
+
+import static android.widget.Toast.LENGTH_SHORT;
 
 public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 
@@ -24,6 +30,7 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> {
         overlayItemList.add(newItem);
         populate();
     }
+
 
     @Override
     public boolean onSnapToItem(int arg0, int arg1, Point arg2, IMapView arg3) {
