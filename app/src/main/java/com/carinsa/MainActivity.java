@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.carinsa.grandlyon.GrandLyon;
@@ -189,8 +190,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
 
-        //map = (MapView) findViewById(R.id.map);
-        //map.setTileSource(TileSourceFactory.MAPNIK);
+
 
         //marker starter
         Marker startMarker = new Marker(map);
@@ -274,24 +274,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//
-//        if (id == R.id.action_settings) {
-//            return true;
-//        } else if (id == R.id.action_locate) {
-//            setCenterInMyCurrentLocation();
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 
     public void onResume(){
         super.onResume();
@@ -345,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         final AutoCompleteTextView autoComplete = (AutoCompleteTextView) findViewById(R.id.search_view);
 
         //On récupère le bouton que l'on a créé dans le fichier main.xml
-        Button boutonRecherche = (Button) findViewById(R.id.ButtonEnvoyer);
+        ImageButton boutonRecherche = (ImageButton) findViewById(R.id.ButtonEnvoyer);
 
         //On crée la liste d'autocomplétion à partir de notre tableau de string appelé tableauString
         //android.R.layout.simple_dropdown_item_1line permet de définir le style d'affichage de la liste
