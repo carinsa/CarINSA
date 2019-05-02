@@ -1,4 +1,5 @@
 package com.carinsa;
+import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.Manifest;
@@ -42,6 +43,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
     private AutoCompleteTextView searchBar;
     private MapView map = null;
     private MyItemizedOverlay myItemizedOverlay = null;
@@ -50,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private FusedLocationProviderClient mFusedLocationClient;
+    private FloatingActionButton fab;
 
     private static final int MULTIPLE_PERMISSION_REQUEST_CODE = 4;
     private final Handler handler = new Handler();
@@ -131,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void setupMap() {
-
+        fab = findViewById(R.id.fab);
         map = findViewById(R.id.map);
         map.setClickable(true);
 
@@ -208,6 +211,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         grandlyon = new GrandLyon(this);
         grandlyon.fetchParkings();
 
+        //click effect for fab
+        fab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                setCenterInMyCurrentLocation();
+            }
+        });
 
         handler.postDelayed(new Runnable() {
             @Override
