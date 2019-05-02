@@ -1,5 +1,6 @@
 package com.carinsa;
-
+import android.view.View.OnClickListener;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,13 +8,20 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.SearchView;
+import android.widget.Toast;
+
+import static android.widget.Toast.LENGTH_SHORT;
 
 public class MainActivity extends AppCompatActivity {
     //MapView map = null;
-    private SearchView searchBar;
+    private AutoCompleteTextView searchBar;
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         //handle permissions first, before map is created. not depicted here
 
@@ -30,14 +38,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         searchBar = findViewById(R.id.search_view);
         Log.e("1", "test");
-        searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchBar.setOnClickListener(new OnClickListener() {
             @Override
+            public void onClick(View v) {
+                finish();
+            }
+
             public boolean onQueryTextSubmit(String query) {
                 callSearch(query);
                 return true;
             }
 
-            @Override
+
             public boolean onQueryTextChange(String newText) {
 //              if (searchView.isExpanded() && TextUtils.isEmpty(newText)) {
                 callSearch(newText);
@@ -45,13 +57,17 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
+
             private void callSearch(String query) {
                 Log.e("1", query);
             }
-
         });
+
+
+
         //map = (MapView) findViewById(R.id.map);
         //map.setTileSource(TileSourceFactory.MAPNIK);
+        onCreate2(savedInstanceState);
     }
 
     public void onResume(){
@@ -71,4 +87,43 @@ public class MainActivity extends AppCompatActivity {
         //Configuration.getInstance().save(this, prefs);
         //map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
     }
+
+//AutoJoseph
+
+    public void onCreate2(Bundle savedInstanceState) {
+
+        setContentView(R.layout.activity_main);
+
+        //On récupère le tableau de String créé dans le fichier string.xml
+        String[] tableauString = getResources().getStringArray(R.array.tableau);
+
+        //On récupère l'AutoCompleteTextView que l'on a créé dans le fichier main.xml
+        final AutoCompleteTextView autoComplete = (AutoCompleteTextView) findViewById(R.id.search_view);
+
+        //On récupère le bouton que l'on a créé dans le fichier main.xml
+        Button boutonRecherche = (Button) findViewById(R.id.ButtonEnvoyer);
+
+        //On crée la liste d'autocomplétion à partir de notre tableau de string appelé tableauString
+        //android.R.layout.simple_dropdown_item_1line permet de définir le style d'affichage de la liste
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, tableauString);
+
+        //On affecte cette liste d'autocomplétion à notre objet d'autocomplétion
+        autoComplete.setAdapter(adapter);
+
+        //Enfin on rajoute un petit écouteur d'évènement sur le bouton pour afficher
+        //dans un Toast ce que l'on a rentré dans notre AutoCompleteTextView
+
+        boutonRecherche.setOnClickListener(new OnClickListener() {
+
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, autoComplete.getText(), LENGTH_SHORT).show();
+            }
+        });
+
+
+    }
+
+
+
+
 }

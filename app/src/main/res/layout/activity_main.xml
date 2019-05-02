@@ -7,16 +7,29 @@
     tools:context=".MainActivity">
 
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-        <SearchView
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
+        <AutoCompleteTextView
             android:id="@+id/search_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="5dip"
+            android:layout_marginTop="10dip"
+            android:layout_marginLeft="5dip"  />
 
-    </android.support.design.widget.AppBarLayout>
+        <Button android:id="@+id/ButtonEnvoyer"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="8dip"
+            android:layout_marginRight="5dip"
+            android:text="Recherche"/>
+
+    </LinearLayout>
+
 
     <include layout="@layout/content_main" />
 
