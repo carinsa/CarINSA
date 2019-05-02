@@ -1,4 +1,5 @@
 package com.carinsa;
+
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -59,7 +60,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private final Handler handler = new Handler();
 
 
-    @Override public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
 
 
         super.onCreate(savedInstanceState);
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         //note, the load method also sets the HTTP User Agent to your application's package name, abusing osm's tile servers will get you banned based on this string
 
         //inflate and create the map
-         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -149,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         Drawable marker;
         /* marker star for future use*/
-        marker=getResources().getDrawable(android.R.drawable.star_big_on);
+        marker = getResources().getDrawable(android.R.drawable.star_big_on);
         int markerWidth = marker.getIntrinsicWidth();
         int markerHeight = marker.getIntrinsicHeight();
         marker.setBounds(0, markerHeight, markerWidth, 0);
@@ -189,9 +191,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
 
 
-
-
-
         //marker starter
         Marker startMarker = new Marker(map);
         startMarker.setPosition(startPoint);
@@ -203,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         map.getOverlays().add(compassOverlay);
 
         //my position
-        myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this),map);
+        myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), map);
         map.getOverlays().add(myLocationOverlay);
         myLocationOverlay.enableMyLocation();
 
@@ -223,10 +222,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void run() {
 
                 //Check something after 1 second
-                if(grandlyon.fetchStatus()!=1){
+                if (grandlyon.fetchStatus() != 1) {
                     handler.postDelayed(this, 100);
-                }else{
-                    Log.d("hy",grandlyon.getClosestAvailableParking(45.75,4.85,5000).getName());
+                } else {
+                    Log.d("hy", grandlyon.getClosestAvailableParking(45.75, 4.85, 5000).getName());
                 }
 
             }
@@ -249,16 +248,26 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (mLastLocation != null) {
             map.getController().setCenter(new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
         } else {
-            Toast.makeText(this, "Getting current location", LENGTH_SHORT).show();
+            getMylocation();
+            if(mLastLocation==null){
+                Toast.makeText(this, "get location failed", LENGTH_SHORT).show();
+            }else{
+                map.getController().setCenter(new GeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            }
         }
     }
 
     @Override
     public void onConnected(Bundle connectionHint) {
+        getMylocation();
+
+
+    }
+
+    public void getMylocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-
         mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
@@ -268,8 +277,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 }
             }
         });
-
-
     }
 
 
