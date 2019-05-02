@@ -1,4 +1,17 @@
 <resources>
     <string name="app_name">CarINSA</string>
     <string name="action_settings">Settings</string>
+    <string-array name="tableau">
+        <item>android</item>
+        <item>iPhone</item>
+        <item>tutoriel</item>
+        <item>iPod</item>
+        <item>iPad</item>
+        <item>blackberry</item>
+        <item>tutoriaux</item>
+        <item>Tuto Mobile</item>
+        <item>tutorial</item>
+        <item>bada</item>
+        <item>tuto</item>
+    </string-array>
 </resources>
