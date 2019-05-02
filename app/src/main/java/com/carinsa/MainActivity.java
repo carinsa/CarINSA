@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -35,6 +36,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private final Handler handler = new Handler();
 
     private ArrayList<Marker> markers=new ArrayList<Marker>();
+    private Marker destination=null;
 
     @Override public void onCreate(Bundle savedInstanceState) {
 
@@ -240,7 +243,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 @Override
                 public boolean onMarkerClick(Marker marker,
                                       MapView mapView){
-                    Log.e("tap", marker.getRelatedObject().toString());
+                    Parking parking= (Parking) marker.getRelatedObject();
+                    mapView.getController().animateTo(new GeoPoint(parking.getLat(),parking.getLng()));
+                    Log.e("tap", parking.toString());
                     return true;
                 }
           });
@@ -361,11 +366,55 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onClick(View v) {
                 double[] coords= getLocationFromAddress(autoComplete.getText().toString());
                 if (coords != null){
-                    Parking p = grandlyon.getClosestAvailableParking(coords[0],coords[1],5000);
-                    addMarker(p);
-                    map.getController().setCenter(new GeoPoint(p.getLat(),p.getLng()));
+                    /*if(!destination.equals(null)){
+                        destination.remove(map);
+                        destination=null;
+                    }*/
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
+                    Parking p = grandlyon.getClosestAvailableParking(coords[0],coords[1],1000);
+                    Parking[] ps = grandlyon.getParkings(coords[0],coords[1],1000);
+
+                    double minLat = Double.MAX_VALUE;
+                    double maxLat = Double.MIN_VALUE;
+                    double minLng = Double.MAX_VALUE;
+                    double maxLng = Double.MIN_VALUE;
+                    for(int i=0;i<ps.length;i++){
+                        if (ps[i].getLat()<minLat)
+                            minLat = ps[i].getLat();
+                        if (ps[i].getLat()>maxLat)
+                            maxLat = ps[i].getLat();
+                        if (ps[i].getLng()<minLng)
+                            minLng = ps[i].getLng();
+                        if (ps[i].getLng()>maxLng)
+                            maxLng = ps[i].getLng();
+                    }
+                    BoundingBox boundingBox = new BoundingBox();
+                    boundingBox.set(maxLat,maxLng,minLat,minLng);
+                    //map.getController().setCenter(new GeoPoint(p.getLat(),p.getLng()));
                     IMapController mapController = map.getController();
-                    mapController.setZoom(15);
+                    //mapController.setZoom(15);
+                    map.zoomToBoundingBox(boundingBox,true);
+
+
+                    GeoPoint parkingGeo = new GeoPoint(coords[0],coords[1]);
+                    destination = new Marker(map);
+
+                    destination.setPosition(parkingGeo);
+                    destination.setIcon(getResources().getDrawable(android.R.drawable.ic_delete));
+                    destination.setOnMarkerClickListener(new Marker.OnMarkerClickListener(){
+                        @Override
+                        public boolean onMarkerClick(Marker marker,
+                                                     MapView mapView){
+                            mapView.getOverlayManager().remove(marker);
+                            return true;
+                        }
+                    });
+                    map.getOverlays().add(destination);
+                    markers.add(destination);
+
+                    //mapController.animateTo(new GeoPoint(p.getLat(),p.getLng()));
                     Toast.makeText(MainActivity.this, autoComplete.getText(), LENGTH_SHORT).show();
                 }else{
                      //TODO
