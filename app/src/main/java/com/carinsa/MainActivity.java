@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         //handle permissions first, before map is created. not depicted here
 
@@ -84,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         searchBar.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                //finish();
             }
 
             public boolean onQueryTextSubmit(String query) {
@@ -321,7 +320,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void onCreate2(Bundle savedInstanceState) {
 
-        setContentView(R.layout.activity_main);
 
         //On récupère le tableau de String créé dans le fichier string.xml
         String[] tableauString = getResources().getStringArray(R.array.tableau);
