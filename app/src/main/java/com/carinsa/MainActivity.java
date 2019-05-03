@@ -1,8 +1,10 @@
 package com.carinsa;
 import android.content.res.AssetManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.design.widget.FloatingActionButton;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.Manifest;
@@ -18,11 +20,17 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.carinsa.grandlyon.GrandLyon;
@@ -52,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -65,14 +74,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private Location mLastLocation;
     private FusedLocationProviderClient mFusedLocationClient;
     private FloatingActionButton fab;
+    private PopupWindow popupWindow;
+    private View popupView;
+    private TranslateAnimation animation;
 
     private static final int MULTIPLE_PERMISSION_REQUEST_CODE = 4;
     private final Handler handler = new Handler();
 
-    private ArrayList<Marker> markers=new ArrayList<Marker>();
-    private Marker destination=null;
+    private ArrayList<Marker> markers = new ArrayList<Marker>();
+    private Marker destination = null;
 
-    @Override public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
 
 
         super.onCreate(savedInstanceState);
@@ -80,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
-         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -151,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         Drawable marker;
         /* marker star for future use*/
-        marker=getResources().getDrawable(android.R.drawable.star_big_on);
+        marker = getResources().getDrawable(android.R.drawable.star_big_on);
         int markerWidth = marker.getIntrinsicWidth();
         int markerHeight = marker.getIntrinsicHeight();
         marker.setBounds(0, markerHeight, markerWidth, 0);
@@ -198,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         map.getOverlays().add(compassOverlay);
 
         //my position
-        myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this),map);
+        myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), map);
         map.getOverlays().add(myLocationOverlay);
         myLocationOverlay.enableMyLocation();
 
@@ -218,11 +231,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void run() {
 
                 //Check something after 1 second
-                if(grandlyon.fetchStatus()!=1){
+                if (grandlyon.fetchStatus() != 1) {
                     handler.postDelayed(this, 100);
-                }else{
+                } else {
                     Parking[] p = grandlyon.getAllParkings();
-                    for(int i=0;i<p.length;i++) {
+                    for (int i = 0; i < p.length; i++) {
                         addMarker(p[i]);
                     }
                 }
@@ -230,30 +243,36 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }, 500); // first trigger 3000ms. asynchrone!!
     }
 
-    protected void addMarker(Parking p){
-        for(int i=0;i<markers.size();i++) {
-            if(markers.get(i).getRelatedObject().toString().equals(p.toString())){
+    protected void addMarker(Parking p) {
+        for (int i = 0; i < markers.size(); i++) {
+            if (markers.get(i).getRelatedObject().toString().equals(p.toString())) {
                 return;
             }
         }
-        GeoPoint parkingGeo = new GeoPoint(p.getLat(),p.getLng());
+        GeoPoint parkingGeo = new GeoPoint(p.getLat(), p.getLng());
         Marker parkingMarker = new Marker(map);
 
-        parkingMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener(){
-                @Override
-                public boolean onMarkerClick(Marker marker,
-                                      MapView mapView){
-                    Parking parking= (Parking) marker.getRelatedObject();
-                    mapView.getController().animateTo(new GeoPoint(parking.getLat(),parking.getLng()));
-                    Log.e("tap", parking.toString());
-                    return true;
-                }
-          });
+        parkingMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker,
+                                         MapView mapView) {
+                Parking parking = (Parking) marker.getRelatedObject();
+                mapView.getController().animateTo(new GeoPoint(parking.getLat(), parking.getLng()));
+
+                String pos = Double.toString(parking.getLat())+" "+Double.toString(parking.getLng());
+
+                pop(pos);
+
+//                Log.e("tap", parking.toString());
+                return true;
+            }
+        });
         parkingMarker.setPosition(parkingGeo);
         parkingMarker.setRelatedObject(p);
         map.getOverlays().add(parkingMarker);
         markers.add(parkingMarker);
     }
+
     protected void onStart() {
         mGoogleApiClient.connect();
         super.onStart();
@@ -292,9 +311,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 
-
-
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         //this will refresh the osmdroid configuration on resuming.
         //if you make changes to the configuration, use
@@ -302,19 +319,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
         handler.postDelayed(new Runnable() {
-        public void run() {
-            setCenterInMyCurrentLocation();
+            public void run() {
+                setCenterInMyCurrentLocation();
 
-        }
-    }, 2000);  // first trigger 3000ms. asynchrone!!
-
+            }
+        }, 2000);  // first trigger 3000ms. asynchrone!!
 
 
 //add
 
     }
 
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         //this will refresh the osmdroid configuration on resuming.
         //if you make changes to the configuration, use
@@ -322,8 +338,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         //Configuration.getInstance().save(this, prefs);
         map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
     }
-
-
 
 
     @Override
@@ -364,8 +378,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         boutonRecherche.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
-                double[] coords= getLocationFromAddress(autoComplete.getText().toString());
-                if (coords != null){
+                double[] coords = getLocationFromAddress(autoComplete.getText().toString());
+                if (coords != null) {
                     /*if(!destination.equals(null)){
                         destination.remove(map);
                         destination=null;
@@ -373,40 +387,40 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
-                    Parking p = grandlyon.getClosestAvailableParking(coords[0],coords[1],1000);
-                    Parking[] ps = grandlyon.getParkings(coords[0],coords[1],1000);
+                    Parking p = grandlyon.getClosestAvailableParking(coords[0], coords[1], 1000);
+                    Parking[] ps = grandlyon.getParkings(coords[0], coords[1], 1000);
 
                     double minLat = Double.MAX_VALUE;
                     double maxLat = Double.MIN_VALUE;
                     double minLng = Double.MAX_VALUE;
                     double maxLng = Double.MIN_VALUE;
-                    for(int i=0;i<ps.length;i++){
-                        if (ps[i].getLat()<minLat)
+                    for (int i = 0; i < ps.length; i++) {
+                        if (ps[i].getLat() < minLat)
                             minLat = ps[i].getLat();
-                        if (ps[i].getLat()>maxLat)
+                        if (ps[i].getLat() > maxLat)
                             maxLat = ps[i].getLat();
-                        if (ps[i].getLng()<minLng)
+                        if (ps[i].getLng() < minLng)
                             minLng = ps[i].getLng();
-                        if (ps[i].getLng()>maxLng)
+                        if (ps[i].getLng() > maxLng)
                             maxLng = ps[i].getLng();
                     }
                     BoundingBox boundingBox = new BoundingBox();
-                    boundingBox.set(maxLat,maxLng,minLat,minLng);
+                    boundingBox.set(maxLat, maxLng, minLat, minLng);
                     //map.getController().setCenter(new GeoPoint(p.getLat(),p.getLng()));
                     IMapController mapController = map.getController();
                     //mapController.setZoom(15);
-                    map.zoomToBoundingBox(boundingBox,true);
+                    map.zoomToBoundingBox(boundingBox, true);
 
 
-                    GeoPoint parkingGeo = new GeoPoint(coords[0],coords[1]);
+                    GeoPoint parkingGeo = new GeoPoint(coords[0], coords[1]);
                     destination = new Marker(map);
 
                     destination.setPosition(parkingGeo);
                     destination.setIcon(getResources().getDrawable(android.R.drawable.ic_delete));
-                    destination.setOnMarkerClickListener(new Marker.OnMarkerClickListener(){
+                    destination.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker,
-                                                     MapView mapView){
+                                                     MapView mapView) {
                             mapView.getOverlayManager().remove(marker);
                             return true;
                         }
@@ -416,14 +430,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                     //mapController.animateTo(new GeoPoint(p.getLat(),p.getLng()));
                     Toast.makeText(MainActivity.this, autoComplete.getText(), LENGTH_SHORT).show();
-                }else{
-                     //TODO
+                } else {
+                    //TODO
                 }
             }
         });
     }
 
-    public double[] getLocationFromAddress(String strAddress){
+    public double[] getLocationFromAddress(String strAddress) {
 
         Geocoder coder = new Geocoder(this);
         List<Address> address;
@@ -431,19 +445,44 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         double[] res = new double[2];
 
         try {
-            address = coder.getFromLocationName(strAddress,5);
-            if (address==null) {
+            address = coder.getFromLocationName(strAddress, 5);
+            if (address == null) {
                 return null;
             }
-            Address location=address.get(0);
+            Address location = address.get(0);
 
-            res[0]=location.getLatitude();
-            res[1]=location.getLongitude();
+            res[0] = location.getLatitude();
+            res[1] = location.getLongitude();
 
             return res;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
+
+
+
+    }
+
+    public void pop(String pos){
+
+        popupView = View.inflate(this, R.layout.popup, null);
+        popupWindow = new PopupWindow(popupView, WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT);
+        TextView tv = popupView.findViewById(R.id.position);
+        tv.setText(pos);
+        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+        popupWindow.setFocusable(true);
+
+        popupWindow.setOutsideTouchable(true);
+
+        animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0,
+                Animation.RELATIVE_TO_PARENT, 1, Animation.RELATIVE_TO_PARENT, 0);
+        animation.setInterpolator(new AccelerateInterpolator());
+        animation.setDuration(200);
+
+        popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 10, 10);
+        popupView.startAnimation(animation);
+
     }
 }
