@@ -62,6 +62,7 @@ import java.util.List;
 
 
 import static android.widget.Toast.LENGTH_SHORT;
+import static org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -154,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private void setupMap() {
         fab = findViewById(R.id.fab);
         map = findViewById(R.id.map);
+        map.getZoomController().setVisibility(NEVER);
         map.setClickable(true);
 
         map.setTileSource(TileSourceFactory.MAPNIK);
@@ -220,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         grandlyon.fetchParkings();
 
         //click effect for fab
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 setCenterInMyCurrentLocation();
             }
