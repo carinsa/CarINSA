@@ -1,8 +1,8 @@
 package com.carinsa;
-import android.content.res.AssetManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.view.Gravity;
 import android.view.View;
@@ -27,13 +27,18 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.carinsa.grandlyon.GrandLyon;
+import com.android.volley.Cache;
+import com.android.volley.Network;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.android.volley.toolbox.HurlStack;
+import com.carinsa.backendapi.BackendAPI;
 import com.carinsa.model.Parking;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -52,12 +57,8 @@ import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private MapView map = null;
     private MyItemizedOverlay myItemizedOverlay = null;
     private MyLocationNewOverlay myLocationOverlay = null;
-    private GrandLyon grandlyon = null;
+    private BackendAPI bapi = null;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -216,9 +217,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         myLocationOverlay.enableMyLocation();
 
 
-        grandlyon = new GrandLyon(this);
-        grandlyon.fetchParkings();
+        Cache cache = new DiskBasedCache(this.getCacheDir(), 1024 * 1024);
+        Network network = new BasicNetwork(new HurlStack());
+        RequestQueue requestQueue = new RequestQueue(cache, network);
+        requestQueue.start();
 
+        bapi = new BackendAPI(requestQueue, Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
+        bapi.fetchParkings(new Runnable() {
+            @Override
+            public void run() {
+                Parking[] parkings = bapi.getAllParkings();
+                for(int i=0;i<parkings.length;i++){
+                    Log.e("p",parkings[i].toString());
+                    addMarker(parkings[i]);
+                }
+            }
+        });
         //click effect for fab
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -226,21 +240,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                //Check something after 1 second
-                if (grandlyon.fetchStatus() != 1) {
-                    handler.postDelayed(this, 100);
-                } else {
-                    Parking[] p = grandlyon.getAllParkings();
-                    for (int i = 0; i < p.length; i++) {
-                        addMarker(p[i]);
-                    }
-                }
-            }
-        }, 500); // first trigger 3000ms. asynchrone!!
     }
 
     protected void addMarker(Parking p) {
@@ -352,13 +351,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void setupSearchBar(Bundle savedInstanceState) {
         try {
-            grandlyon.serialyzeAdresses(this);
+            bapi.serialyzeAdresses(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         //On récupère le tableau de String créé dans le fichier string.xml
-        String[] tableauString = grandlyon.getAdresses();
+        String[] tableauString = bapi.getAdresses();
 
         //On récupère l'AutoCompleteTextView que l'on a créé dans le fichier main.xml
         final AutoCompleteTextView autoComplete = (AutoCompleteTextView) findViewById(R.id.search_view);
@@ -387,8 +386,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
-                    Parking p = grandlyon.getClosestAvailableParking(coords[0], coords[1], 1000);
-                    Parking[] ps = grandlyon.getParkings(coords[0], coords[1], 1000);
+                    Parking p = bapi.getClosestAvailableParking(coords[0], coords[1], 1000);
+                    Parking[] ps = bapi.getParkings(coords[0], coords[1], 1000);
 
                     double minLat = Double.MAX_VALUE;
                     double maxLat = Double.MIN_VALUE;
