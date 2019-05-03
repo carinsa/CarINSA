@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 }else{
                     Parking[] p = grandlyon.getAllParkings();
                     for(int i=0;i<p.length;i++) {
-                        addMarker(p[i]);
+                        //addMarker(p[i]);
                     }
                 }
             }
@@ -231,6 +231,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     protected void addMarker(Parking p){
+        ArrayList<Marker> markers=new ArrayList<Marker>();
         for(int i=0;i<markers.size();i++) {
             if(markers.get(i).getRelatedObject().toString().equals(p.toString())){
                 return;
@@ -364,6 +365,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         boutonRecherche.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
+                map.getOverlayManager().remove(destination);
+
+
+                for (int u=0; u<markers.size();u++){
+                    Log.e("jo",markers.get(u).toString());
+                    map.getOverlayManager().remove(markers.get(u));
+                }
+
+
+
+
                 double[] coords= getLocationFromAddress(autoComplete.getText().toString());
                 if (coords != null){
                     /*if(!destination.equals(null)){
@@ -373,7 +385,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
-                    Parking p = grandlyon.getClosestAvailableParking(coords[0],coords[1],1000);
+                    Parking[] p = grandlyon.getClosestAvailableParkings(coords[0],coords[1],1000);
+
+                    int k=0;
+                    while(p[k]!=null){
+
+
+                        addMarker(p[k]);
+                        k++;
+                    }
+
+
                     Parking[] ps = grandlyon.getParkings(coords[0],coords[1],1000);
 
                     double minLat = Double.MAX_VALUE;

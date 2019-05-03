@@ -50,7 +50,7 @@ public class GrandLyon {
     }
 
     private static final String GL_USERNAME = "alexandre.van-beurden@insa-lyon.fr";
-    private static final String GL_PASSWORD = "7os9E5+2sPJ7FdWdpDqcxlD9k";  //alex's secret garden
+    private static final String GL_PASSWORD = "r96qFaGe+pq7jatabnz7cN";  //alex's secret garden
     private static final String GL_URL_PARK = "https://download.data.grandlyon.com/ws/rdata/pvo_patrimoine_voirie.pvoparkingtr/all.json";
     private static final String GL_URL_GEO = "https://download.data.grandlyon.com/ws/rdata/pvo_patrimoine_voirie.pvoparkingtr/the_geom.json";
 
@@ -206,6 +206,24 @@ public class GrandLyon {
                 minDist = dist;
                 minPark = parkings[i];
             }
+        }
+        return minPark;
+
+    }
+
+    public Parking[] getClosestAvailableParkings(double lat, double lng, int radius) {
+        Parking[] minPark = new Parking[parkings.length];
+        int j=0;
+        for (int i = 0; i < parkings.length; i++) {
+            double dist = distance(lat, lng, parkings[i].getLat(), parkings[i].getLng());
+            if (/*parkings[i].getAvailableSpots() > 0 && */dist <= radius) {
+                minPark[j] = parkings[i];
+                j++;
+            }
+        }
+        minPark[j]=null;
+        for (int k = 0; k < j; k++) {
+            Log.e("joseph", minPark[k].getName());
         }
         return minPark;
 
