@@ -261,8 +261,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Parking parking = (Parking) marker.getRelatedObject();
                 mapView.getController().animateTo(new GeoPoint(parking.getLat(), parking.getLng()));
 
-                String pos = Double.toString(parking.getLat())+" "+Double.toString(parking.getLng());
-
+//                String pos = Double.toString(parking.getLat())+" "+Double.toString(parking.getLng());
+                String pos = parking.toString()+parking.getState()+parking.getAvailableSpots();
                 pop(pos);
 
 //                Log.e("tap", parking.toString());
@@ -483,7 +483,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         animation.setInterpolator(new AccelerateInterpolator());
         animation.setDuration(200);
 
-        popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 10, 10);
+        popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 0, 0);
         popupView.startAnimation(animation);
 
     }
