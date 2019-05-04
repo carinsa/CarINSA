@@ -1,19 +1,25 @@
 package com.carinsa.model;
 
 public class Parking {
+    private int pkgid;
     private String name;
     private double lat;
     private double lng;
-    private int state;
     private int availableSpots;
-    public Parking(String name, double lat, double lng, int state, int availableSpots){
+    private Avis avis;
+    public Parking(int pkgid,String name, double lat, double lng, int availableSpots){
+        this.pkgid=pkgid;
         this.name=name;
         this.lat=lat;
         this.lng=lng;
-        this.state=state;
         this.availableSpots=availableSpots;
     }
 
+    public Avis getAvis() {
+        return avis;
+    }
+
+    public int getPkgid() { return pkgid; }
     public String getName() {
         return name;
     }
@@ -23,13 +29,15 @@ public class Parking {
     public double getLng() {
         return lng;
     }
-    public int getState() {
-        return state;
-    }
     public int getAvailableSpots() {
         return availableSpots;
     }
 
+    public void setAvis(Avis avis) {
+        this.avis = avis;
+    }
+
+    public void setPkgid(int pkgid) { this.pkgid = pkgid; }
     public void setName(String name) {
         this.name = name;
     }
@@ -39,15 +47,12 @@ public class Parking {
     public void setLng(double lng) {
         this.lng = lng;
     }
-    public void setState(int state) {
-        this.state = state;
-    }
     public void setAvailableSpots(int availableSpots) {
         this.availableSpots = availableSpots;
     }
 
     public String toString() {
-        String ret=name+" "+lat+" "+lng+" "+state+" "+availableSpots;
+        String ret=name+" "+lat+" "+lng+" "+availableSpots;
         return ret;
     }
 }
