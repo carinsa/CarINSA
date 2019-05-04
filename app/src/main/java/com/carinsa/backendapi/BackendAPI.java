@@ -30,7 +30,8 @@ public class BackendAPI {
     private String uid;
     private int fetchStatus=-1;
     private Runnable callback;
-    private static final String URL_PARKINGS = "http://10.43.0.77/DEV/parkings/getParkings.php";
+    private static final String URL_GETPARKINGS = "http://192.168.1.100/DEV/parkings/getParkings.php";
+    private static final String URL_RATEPARKING = "http://192.168.1.100/DEV/parkings/setRating.php";
 
     public BackendAPI(RequestQueue rq,String uid){
         this.rq=rq;
@@ -41,7 +42,7 @@ public class BackendAPI {
         this.callback=callback;
         Log.e("callback",callback.toString());
         fetchStatus=0;
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_PARKINGS+"?u="+uid, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_GETPARKINGS+"?u="+uid, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -90,6 +91,23 @@ public class BackendAPI {
     }
     public int fetchStatus() {
         return fetchStatus;
+    }
+
+    public void rateParking(Parking p, int rating){
+        if(rating>=0 && rating<=3){
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_RATEPARKING+"?u="+uid+"&p="+p.getPkgid()+"&r="+rating, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Log.e("json",response.toString());
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("json",error.toString());
+                }
+            });
+            rq.add(jsonObjectRequest);
+        }
     }
 
     public Parking[] getAllParkings() {

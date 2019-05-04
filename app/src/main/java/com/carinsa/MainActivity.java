@@ -258,9 +258,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Parking parking = (Parking) marker.getRelatedObject();
                 mapView.getController().animateTo(new GeoPoint(parking.getLat(), parking.getLng()));
 
-                String pos = Double.toString(parking.getLat())+" "+Double.toString(parking.getLng());
+                //String pos = Double.toString(parking.getLat())+" "+Double.toString(parking.getLng());
 
-                pop(pos);
+                popParking(parking);
 
 //                Log.e("tap", parking.toString());
                 return true;
@@ -462,6 +462,33 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
     }
+    public void popParking(Parking p){
+
+        popupView = View.inflate(this, R.layout.popup, null);
+        popupWindow = new PopupWindow(popupView, WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT);
+        TextView tv = popupView.findViewById(R.id.position);
+        if(p.getAvailableSpots()!=-1) {
+            tv.setText(p.getName() + "\n" + p.getAvailableSpots()+" places libres");
+        }
+        else {
+            tv.setText(p.getName());
+        }
+        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+        popupWindow.setFocusable(true);
+
+        popupWindow.setOutsideTouchable(true);
+
+        animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0,
+                Animation.RELATIVE_TO_PARENT, 1, Animation.RELATIVE_TO_PARENT, 0);
+        animation.setInterpolator(new AccelerateInterpolator());
+        animation.setDuration(200);
+
+        popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 10, 10);
+        popupView.startAnimation(animation);
+
+    }
+
 
     public void pop(String pos){
 
