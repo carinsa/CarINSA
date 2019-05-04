@@ -268,6 +268,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
         parkingMarker.setPosition(parkingGeo);
         parkingMarker.setRelatedObject(p);
+        if(p.getAvailableSpots()>0) {
+            parkingMarker.setIcon(getResources().getDrawable(R.drawable.markeravailable50));
+        }
+        else if(p.getAvailableSpots()==0) {
+            parkingMarker.setIcon(getResources().getDrawable(R.drawable.markerfull50));
+        }
+        else {
+            parkingMarker.setIcon(getResources().getDrawable(R.drawable.markerunknown50));
+        }
         map.getOverlays().add(parkingMarker);
         markers.add(parkingMarker);
     }
