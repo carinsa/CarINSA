@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">CarINSA</string>
     <string name="action_settings">Settings</string>
+    <string name="bottom_sheet_peek">bottom_sheet_peek</string>
+    <string name="bottom_sheet_content">bottom_sheet_content</string>
     <string-array name="tableau">
         <item>android</item>
         <item>iPhone</item>

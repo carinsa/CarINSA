@@ -1,8 +1,10 @@
 package com.carinsa;
-import android.content.res.AssetManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
+import android.provider.Settings;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.view.Gravity;
 import android.view.View;
@@ -27,13 +29,19 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.carinsa.grandlyon.GrandLyon;
+import com.android.volley.Cache;
+import com.android.volley.Network;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.android.volley.toolbox.HurlStack;
+import com.carinsa.backendapi.BackendAPI;
 import com.carinsa.model.Parking;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -43,21 +51,19 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -70,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private MapView map = null;
     private MyItemizedOverlay myItemizedOverlay = null;
     private MyLocationNewOverlay myLocationOverlay = null;
-    private GrandLyon grandlyon = null;
+    private BackendAPI bapi = null;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -78,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private PopupWindow popupWindow;
     private View popupView;
     private TranslateAnimation animation;
+    private  BottomSheetBehavior bottomSheetBehavior;
+    private LinearLayout llBottomSheet;
 
     private static final int MULTIPLE_PERMISSION_REQUEST_CODE = 4;
     private final Handler handler = new Handler();
@@ -90,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
@@ -153,10 +160,32 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void setupMap() {
+
+
+        setContentView(R.layout.activity_main);
+
+        llBottomSheet = (LinearLayout) findViewById(R.id.bottom_fragment);
+        bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+
+
+
         fab = findViewById(R.id.fab);
         map = findViewById(R.id.map);
         map.getZoomController().setVisibility(NEVER);
         map.setClickable(true);
+        map.getOverlays().add(new MapEventsOverlay(new MapEventsReceiver() {
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                Log.e("MapView", "normal click");
+                return true;
+            }
+            public boolean longPressHelper(GeoPoint p) {
+                Log.e("MapView", "long click");
+                return false;
+            }
+        }));
 
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
@@ -218,9 +247,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         myLocationOverlay.enableMyLocation();
 
 
-        grandlyon = new GrandLyon(this);
-        grandlyon.fetchParkings();
+        Cache cache = new DiskBasedCache(this.getCacheDir(), 1024 * 1024);
+        Network network = new BasicNetwork(new HurlStack());
+        RequestQueue requestQueue = new RequestQueue(cache, network);
+        requestQueue.start();
 
+        bapi = new BackendAPI(requestQueue, Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
+        bapi.fetchParkings(new Runnable() {
+            @Override
+            public void run() {
+                Parking[] parkings = bapi.getAllParkings();
+                for(int i=0;i<parkings.length;i++){
+                    Log.e("p",parkings[i].toString());
+                    addMarker(parkings[i]);
+                }
+            }
+        });
         //click effect for fab
         fab.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -228,21 +270,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                //Check something after 1 second
-                if (grandlyon.fetchStatus() != 1) {
-                    handler.postDelayed(this, 100);
-                } else {
-                    Parking[] p = grandlyon.getAllParkings();
-                    for (int i = 0; i < p.length; i++) {
-                        addMarker(p[i]);
-                    }
-                }
-            }
-        }, 500); // first trigger 3000ms. asynchrone!!
     }
 
     protected void addMarker(Parking p) {
@@ -261,9 +288,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Parking parking = (Parking) marker.getRelatedObject();
                 mapView.getController().animateTo(new GeoPoint(parking.getLat(), parking.getLng()));
 
-//                String pos = Double.toString(parking.getLat())+" "+Double.toString(parking.getLng());
-                String pos = parking.toString()+parking.getState()+parking.getAvailableSpots();
-                pop(pos);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+
+                TextView viewPeek = llBottomSheet.findViewById(R.id.bottom_peek);
+                TextView viewContent = llBottomSheet.findViewById(R.id.bottom_content);
+
+                viewPeek.setText(parking.getName());
+                if(parking.getAvailableSpots()!=-1) {
+                    String str = parking.getAvailableSpots()+" "+"places libres";
+                    viewContent.setText(str);
+                }
+                else {
+                    viewContent.setText("No information");
+                }
+//                popParking(parking);
 
 //                Log.e("tap", parking.toString());
                 return true;
@@ -271,6 +310,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
         parkingMarker.setPosition(parkingGeo);
         parkingMarker.setRelatedObject(p);
+        if(p.getAvailableSpots()>0) {
+            parkingMarker.setIcon(getResources().getDrawable(R.drawable.markeravailable50));
+        }
+        else if(p.getAvailableSpots()==0) {
+            parkingMarker.setIcon(getResources().getDrawable(R.drawable.markerfull50));
+        }
+        else {
+            parkingMarker.setIcon(getResources().getDrawable(R.drawable.markerunknown50));
+        }
         map.getOverlays().add(parkingMarker);
         markers.add(parkingMarker);
     }
@@ -354,13 +402,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void setupSearchBar(Bundle savedInstanceState) {
         try {
-            grandlyon.serialyzeAdresses(this);
+            bapi.serialyzeAdresses(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         //On récupère le tableau de String créé dans le fichier string.xml
-        String[] tableauString = grandlyon.getAdresses();
+        String[] tableauString = bapi.getAdresses();
 
         //On récupère l'AutoCompleteTextView que l'on a créé dans le fichier main.xml
         final AutoCompleteTextView autoComplete = (AutoCompleteTextView) findViewById(R.id.search_view);
@@ -389,8 +437,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
-                    Parking p = grandlyon.getClosestAvailableParking(coords[0], coords[1], 1000);
-                    Parking[] ps = grandlyon.getParkings(coords[0], coords[1], 1000);
+                    Parking p = bapi.getClosestAvailableParking(coords[0], coords[1], 1000);
+                    Parking[] ps = bapi.getParkings(coords[0], coords[1], 1000);
 
                     double minLat = Double.MAX_VALUE;
                     double maxLat = Double.MIN_VALUE;
@@ -465,6 +513,35 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
     }
+    public void popParking(Parking p){
+
+        popupView = View.inflate(this, R.layout.popup, null);
+        popupWindow = new PopupWindow(popupView, WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT);
+        TextView tv = popupView.findViewById(R.id.position);
+        if(p.getAvailableSpots()!=-1) {
+            tv.setText(p.getName() + "\n" + p.getAvailableSpots()+" places libres");
+        }
+        else {
+            tv.setText(p.getName());
+        }
+        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+        popupWindow.setFocusable(true);
+
+        popupWindow.setOutsideTouchable(true);
+
+        animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0,
+                Animation.RELATIVE_TO_PARENT, 1, Animation.RELATIVE_TO_PARENT, 0);
+        animation.setInterpolator(new AccelerateInterpolator());
+        animation.setDuration(200);
+
+        popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 10, 10);
+        popupView.startAnimation(animation);
+
+
+
+    }
+
 
     public void pop(String pos){
 
@@ -485,6 +562,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 0, 0);
         popupView.startAnimation(animation);
+        TranslateAnimation animation1 = new TranslateAnimation(0,0,100,100);
+        fab.startAnimation(animation1);
 
     }
 }
