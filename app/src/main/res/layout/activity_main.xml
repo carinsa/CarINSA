@@ -65,6 +65,18 @@
 
     <android.support.design.widget.FloatingActionButton
 
+        android:id="@+id/navigate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="120dp"
+        android:src="@drawable/cursor"
+        android:tint="@android:color/black"
+        app:backgroundTint="@android:color/holo_blue_dark"
+        app:layout_anchor="@+id/bottom_fragment"
+        app:layout_anchorGravity="top|end" />
+
+    <android.support.design.widget.FloatingActionButton
+
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
