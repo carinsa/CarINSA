@@ -57,4 +57,36 @@ public class Avis {
     public void setAvisComplet(boolean avisComplet) {
         this.avisComplet = avisComplet;
     }
+
+    public int getComplet() {
+        return complet;
+    }
+
+    public int getLibre() {
+        return libre;
+    }
+
+    public int getOuvert() {
+        return ouvert;
+    }
+
+    public int getFerme() {
+        return ferme;
+    }
+
+    public boolean isAvisOuvert() {
+        return avisOuvert;
+    }
+
+    public boolean isAvisLibre() {
+        return avisLibre;
+    }
+
+    public boolean isAvisFerme() {
+        return avisFerme;
+    }
+
+    public boolean isAvisComplet() {
+        return avisComplet;
+    }
 }

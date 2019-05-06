@@ -30,8 +30,8 @@ public class BackendAPI {
     private String uid;
     private int fetchStatus=-1;
     private Runnable callback;
-    private static final String URL_GETPARKINGS = "http://192.168.1.56/smart/getParkings.php";
-    private static final String URL_RATEPARKING = "http://192.168.1.56/smart/setRating.php";
+    private static final String URL_GETPARKINGS = "http://10.43.5.244/DEV/parkings/getParkings.php";
+    private static final String URL_RATEPARKING = "http://10.43.5.244/DEV/parkings/setRating.php";
 
     public BackendAPI(RequestQueue rq,String uid){
         this.rq=rq;
@@ -95,6 +95,61 @@ public class BackendAPI {
 
     public void rateParking(Parking p, int rating){
         if(rating>=0 && rating<=3){
+            boolean request=true;
+            if(rating==0){
+                if(p.getAvis().isAvisComplet()){
+                    request=false;
+                }
+                else {
+                    p.getAvis().setAvisComplet(true);
+                    p.getAvis().setComplet(p.getAvis().getComplet() + 1);
+                    if(p.getAvis().isAvisLibre()){
+                        p.getAvis().setAvisLibre(false);
+                        p.getAvis().setLibre(p.getAvis().getLibre() - 1);
+                    }
+                }
+
+            }
+            else if(rating==1){
+                if(p.getAvis().isAvisLibre()){
+                    request=false;
+                }
+                else {
+                    p.getAvis().setAvisLibre(true);
+                    p.getAvis().setLibre(p.getAvis().getLibre() + 1);
+                    if(p.getAvis().isAvisComplet()){
+                        p.getAvis().setAvisComplet(false);
+                        p.getAvis().setComplet(p.getAvis().getComplet() - 1);
+                    }
+                }
+            }
+            else if(rating==2){
+                if(p.getAvis().isAvisFerme()){
+                    request=false;
+                }
+                else {
+                    p.getAvis().setAvisFerme(true);
+                    p.getAvis().setFerme(p.getAvis().getFerme() + 1);
+                    if(p.getAvis().isAvisOuvert()){
+                        p.getAvis().setAvisOuvert(false);
+                        p.getAvis().setOuvert(p.getAvis().getOuvert() - 1);
+                    }
+                }
+            }
+            else if(rating==3){
+                if(p.getAvis().isAvisOuvert()){
+                    request=false;
+                }
+                else {
+                    p.getAvis().setAvisOuvert(true);
+                    p.getAvis().setOuvert(p.getAvis().getOuvert() + 1);
+                    if(p.getAvis().isAvisOuvert()){
+                        p.getAvis().setAvisFerme(false);
+                        p.getAvis().setFerme(p.getAvis().getFerme() - 1);
+                    }
+                }
+            }
+
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_RATEPARKING+"?u="+uid+"&p="+p.getPkgid()+"&r="+rating, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
@@ -106,7 +161,9 @@ public class BackendAPI {
                     Log.e("json",error.toString());
                 }
             });
-            rq.add(jsonObjectRequest);
+            if(request) {
+                rq.add(jsonObjectRequest);
+            }
         }
     }
 
