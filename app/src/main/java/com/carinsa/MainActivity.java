@@ -121,8 +121,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         checkPermissionsState();
 
         setupSearchBar(savedInstanceState);
+        myChecker.run();
+    }
 
+    Runnable myChecker = new Runnable() {
+        @Override
+        public void run() {
+            displayCurrentLocation();
+            handler.postDelayed(myChecker,10000);
+        }
+    };
 
+    void displayCurrentLocation(){
+        if (mLastLocation != null){
+            map.getOverlays().remove(myLocationOverlay);
+            myLocationOverlay.enableMyLocation();
+            map.getOverlays().add(myLocationOverlay);
+        }
     }
 
     private void checkPermissionsState() {
