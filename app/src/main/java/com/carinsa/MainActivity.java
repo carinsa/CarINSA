@@ -551,10 +551,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
         selected=marker;
         selected.setIcon(getResources().getDrawable(R.drawable.markerselected50));
-        Parking parking = (Parking) marker.getRelatedObject();
+        final Parking parking = (Parking) marker.getRelatedObject();
         mapView.getController().animateTo(new GeoPoint(parking.getLat(), parking.getLng()));
 
-        final Parking parking = (Parking) marker.getRelatedObject();
         lastLong = parking.getLng();
                 lastLat = parking.getLat();
                 mapView.getController().animateTo(new GeoPoint(lastLat, lastLong));
