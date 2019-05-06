@@ -45,15 +45,20 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ButtonEnvoyer"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="1.0" />
 
 
     </android.support.constraint.ConstraintLayout>
 
+    <android.support.v7.widget.LinearLayoutCompat
+        android:id="@+id/dummy"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        app:layout_anchor="@id/bottom_fragment">
+
+    </android.support.v7.widget.LinearLayoutCompat>
     <include
         android:id="@+id/bottom_fragment"
         layout="@layout/bottom_sheet"
@@ -65,30 +70,22 @@
 
     <android.support.design.widget.FloatingActionButton
 
-        android:id="@+id/navigate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="120dp"
-        android:src="@drawable/cursor"
-        android:tint="@android:color/black"
-        app:backgroundTint="@android:color/holo_blue_dark"
-        app:layout_anchor="@+id/bottom_fragment"
-        app:layout_anchorGravity="top|end" />
-
-    <android.support.design.widget.FloatingActionButton
-
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
         android:layout_marginBottom="50dp"
+        android:paddingBottom="20dp"
         android:src="@drawable/cursor"
         android:tint="@android:color/black"
         app:backgroundTint="@android:color/holo_blue_dark"
-        app:layout_anchor="@+id/bottom_fragment"
+        app:layout_anchor="@+id/dummy"
         app:layout_anchorGravity="top|end" />
 
 
-</android.support.design.widget.CoordinatorLayout>
+
+
+    </android.support.design.widget.CoordinatorLayout>
 
 
 

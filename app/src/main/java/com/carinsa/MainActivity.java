@@ -32,6 +32,7 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -173,9 +174,31 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         llBottomSheet = (LinearLayout) findViewById(R.id.bottom_fragment);
         bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
+        navigate= findViewById(R.id.navigator);
+
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//        LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) navigate.getLayoutParams();
+//        p.setAnchorId(View.NO_ID);
+//        navigate.setLayoutParams(p);
 
-
+//        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+//            @Override
+//            public void onStateChanged(View bottomSheet, int newState) {
+//                if(newState == BottomSheetBehavior.STATE_COLLAPSED||newState == BottomSheetBehavior.STATE_EXPANDED)
+//                    navigate.show();
+//                else
+//                    navigate.hide();
+//                    fab.setY(10);
+////                Toast.makeText(getApplicationContext(), "onStateChanged() is called.", Toast.LENGTH_SHORT).show();
+//                // this method is called forever i dont understand why???
+//            }
+//
+//            @Override
+//            public void onSlide(View bottomSheet, float slideOffset) {
+////                Toast.makeText(getApplicationContext(), "onStateChanged() is called. in onSlide()", Toast.LENGTH_SHORT).show();
+//                // this method is also called forever i dont understand why???
+//            }
+//        });
 
 
         fab = findViewById(R.id.fab);
@@ -311,7 +334,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 else {
                     viewContent.setText("No information");
                 }
-                navigate= findViewById(R.id.navigate);
                 navigate.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
                         String label = parking.getName();

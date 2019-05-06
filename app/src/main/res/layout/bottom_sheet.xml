@@ -11,16 +11,44 @@
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
     >
 
-    <TextView
-        android:id="@+id/bottom_peek"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/bottom"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:background="#FAF7F7"
-        android:gravity="center"
-        android:text="@string/bottom_sheet_peek"
-        android:textColor="@android:color/black" />
+        >
 
-    <TextView
+        <TextView
+            android:id="@+id/bottom_peek"
+            android:layout_width="311dp"
+            android:layout_height="69dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="3"
+            android:background="#FAF7F7"
+            android:gravity="center"
+            android:text="@string/bottom_sheet_peek"
+            android:textColor="@android:color/black" />
+
+        <android.support.design.widget.FloatingActionButton
+
+            android:id="@+id/navigator"
+            android:layout_width="68dp"
+            android:layout_height="79dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="14dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="30dp"
+            android:layout_weight="1"
+            android:src="@drawable/navigator"
+            android:tint="@android:color/black"
+            app:backgroundTint="@android:color/holo_green_dark" />
+
+    </RelativeLayout>>
+
+
+        <TextView
 
         android:layout_width="match_parent"
         android:id="@+id/bottom_content"
@@ -29,5 +57,8 @@
         android:gravity="center"
         android:text="@string/bottom_sheet_content"
         android:textColor="@android:color/white" />
+
+
+
 
 </LinearLayout>
