@@ -1,7 +1,10 @@
 package com.carinsa;
+import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.provider.Settings;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
@@ -82,11 +85,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private Location mLastLocation;
     private FusedLocationProviderClient mFusedLocationClient;
     private FloatingActionButton fab;
+    private FloatingActionButton navigate;
     private PopupWindow popupWindow;
     private View popupView;
     private TranslateAnimation animation;
     private  BottomSheetBehavior bottomSheetBehavior;
     private LinearLayout llBottomSheet;
+    private double lastLat;
+    private double lastLong;
 
     private static final int MULTIPLE_PERMISSION_REQUEST_CODE = 4;
     private final Handler handler = new Handler();
@@ -158,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                             Manifest.permission.ACCESS_WIFI_STATE},
                     MULTIPLE_PERMISSION_REQUEST_CODE);
         }
+
     }
 
     private void setupMap() {
@@ -547,19 +554,44 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Parking parking = (Parking) marker.getRelatedObject();
         mapView.getController().animateTo(new GeoPoint(parking.getLat(), parking.getLng()));
 
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        final Parking parking = (Parking) marker.getRelatedObject();
+        lastLong = parking.getLng();
+                lastLat = parking.getLat();
+                mapView.getController().animateTo(new GeoPoint(lastLat, lastLong));
+
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
 
-        TextView viewPeek = llBottomSheet.findViewById(R.id.bottom_peek);
-        TextView viewContent = llBottomSheet.findViewById(R.id.bottom_content);
+                TextView viewPeek = llBottomSheet.findViewById(R.id.bottom_peek);
+                TextView viewContent = llBottomSheet.findViewById(R.id.bottom_content);
 
-        viewPeek.setText(parking.getName());
-        if(parking.getAvailableSpots()!=-1) {
-            String str = parking.getAvailableSpots()+" "+"places libres";
-            viewContent.setText(str);
-        }
-        else {
-            viewContent.setText("Pas d'information disponible");
-        }
+                viewPeek.setText(parking.getName());
+                if(parking.getAvailableSpots()!=-1) {
+                    String str = parking.getAvailableSpots()+" "+"places libres";
+                    viewContent.setText(str);
+                }
+                else {
+                    viewContent.setText("No information");
+                }
+                navigate= findViewById(R.id.navigate);
+                navigate.setOnClickListener(new OnClickListener() {
+                    public void onClick(View v) {
+                        String label = parking.getName();
+                        String uriBegin = "google.navigation:q=";
+                        String query = lastLat + "," + lastLong + "(" + label + ")";
+                        String encodedQuery = Uri.encode(query);
+                        String uriString = uriBegin  + encodedQuery ;
+                        Uri uri = Uri.parse(uriString);
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, uri);
+                        mapIntent.setPackage("com.google.android.apps.maps");
+                        PackageManager packageManager = getPackageManager();
+                        List<ResolveInfo> activities = packageManager.queryIntentActivities(mapIntent, 0);
+                        boolean isIntentSafe = activities.size() > 0;
+                        if (isIntentSafe) {
+                            startActivity(mapIntent);
+                        }
+
+                    }
+                });
     }
 }
