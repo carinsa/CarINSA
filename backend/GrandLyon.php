@@ -47,7 +47,7 @@ if(isset($grandLyonUpdate)){
 	$req="SELECT HOUR(TIMEDIFF(NOW(),ps.last_update)) AS diff FROM parking_state ps WHERE ps.last_update IN (SELECT max(last_update) FROM parking_state)";
 	$stmt = $conn->query($req);
 	$select = $stmt->fetch();
-	if($select['diff']>0){
+	if(!isset($select['diff']) or $select['diff']>0){
 		updateGrandLyonData();
 	}
 }
