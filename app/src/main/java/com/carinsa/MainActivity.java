@@ -47,6 +47,7 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.carinsa.backendapi.BackendAPI;
 import com.carinsa.model.Parking;
+import com.carinsa.model.Place;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -289,6 +290,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     Log.e("p", parkings[i].toString());
                     addMarker(parkings[i]);
                 }
+                Parking[] spots = bapi.getAllSpots();
+                for(int i=0;i<spots.length;i++){
+                    Log.e("p",spots[i].toString());
+                    addMarker(spots[i]);
+                }
+                //bapi.addSpot();
             }
         });
         //click effect for fab
@@ -324,6 +331,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
         parkingMarker.setPosition(parkingGeo);
         parkingMarker.setRelatedObject(p);
+
         if (p.getAvailableSpots() > 0) {
             parkingMarker.setIcon(getResources().getDrawable(R.drawable.markeravailable50));
         } else if (p.getAvailableSpots() == 0) {
@@ -565,6 +573,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
         selected = marker;
         selected.setIcon(getResources().getDrawable(R.drawable.markerselected50));
+
         selectedParking = (Parking) marker.getRelatedObject();
         mapView.getController().animateTo(new GeoPoint(selectedParking.getLat(), selectedParking.getLng()));
 
