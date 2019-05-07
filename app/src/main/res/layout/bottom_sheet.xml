@@ -98,89 +98,56 @@
             android:textColor="@android:color/white" />
 
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="85dp"
-            android:layout_marginLeft="22dp"
-            android:gravity="center_horizontal">
 
-
-        <TextView
-            android:layout_marginHorizontal="10dp"
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#00E0DADA"
-            android:text="Parking Complet"
-            android:textColor="@android:color/white" />
-
-            <TextView
-                android:layout_marginHorizontal="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="#00E0DADA"
-                android:text="Parking Libre"
-                android:textColor="@android:color/white" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
-                android:layout_weight="1"
-                android:background="#00E0DADA"
-                android:text="Parking Férmé"
-                android:textColor="@android:color/white" />
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:gravity="center_horizontal">
 
 
-            <android.support.design.widget.FloatingActionButton
-
-                android:id="@+id/avis1"
+            <ru.dimorinny.floatingtextbutton.FloatingTextButton
+                android:id="@+id/complet"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginHorizontal="35dp"
-                android:layout_marginVertical="8dp"
-                android:src="@drawable/navigator"
-                android:tint="@android:color/black"
-                android:layout_gravity="center"
-                app:backgroundTint="@android:color/holo_green_dark" />
+                android:layout_marginRight="3dp"
+                app:floating_background_color="@color/wallet_holo_blue_light"
+                app:floating_left_icon="@drawable/traffic_jam"
+                app:floating_title="Complet"
+                app:floating_title_color="@android:color/white"
 
-            <android.support.design.widget.FloatingActionButton
+                app:layout_behavior="ru.dimorinny.floatingtextbutton.behavior.SnackbarBehavior" />
 
-                android:id="@+id/avis2"
 
-                android:layout_gravity="center"
+            <ru.dimorinny.floatingtextbutton.FloatingTextButton
+                android:id="@+id/libre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="35dp"
-                android:layout_marginVertical="8dp"
-                android:layout_weight="1"
-                android:src="@drawable/libre"
-                app:backgroundTint="@android:color/holo_green_dark" />
+                android:layout_marginRight="3dp"
+                app:floating_background_color="@color/wallet_holo_blue_light"
+                app:floating_left_icon="@drawable/parking"
+                app:floating_title="libre"
+                app:floating_title_color="@android:color/white"
 
-            <android.support.design.widget.FloatingActionButton
+                app:layout_behavior="ru.dimorinny.floatingtextbutton.behavior.SnackbarBehavior" />
 
-                android:id="@+id/avis3"
+            <ru.dimorinny.floatingtextbutton.FloatingTextButton
+                android:id="@+id/ferme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="35dp"
-                android:layout_marginVertical="8dp"
-                android:layout_weight="1"
-                android:src="@drawable/plein"
-                app:backgroundTint="@android:color/holo_green_dark" />
+                app:floating_background_color="@color/wallet_holo_blue_light"
+                app:floating_left_icon="@drawable/close"
+                app:floating_title="fermé"
+                app:floating_title_color="@android:color/white"
+                app:layout_behavior="ru.dimorinny.floatingtextbutton.behavior.SnackbarBehavior"
+
+                />
         </LinearLayout>
+
+
+
     </RelativeLayout>
 
 </LinearLayout>

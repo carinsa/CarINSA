@@ -19,11 +19,12 @@
     </string-array>
 
     <string name="feedbacktype1">public</string>
-    <string name="feedbacktype2">privee</string>
-    <string name="feedbacktype3">stationnement trotoire</string>
-    <string name="feedbacktitle">         More infomation pls</string>
+    <string name="feedbacktype2">privé</string>
+    <string name="feedbacktype3">stationnement trottoire</string>
+    <string name="feedbacktitle">         Plus Information</string>
     <string name="feedbacktype">typelist</string>
-    <string name="feedbackbutton">go</string>
+    <string name="feedbackbutton">Allez!</string>
+
     <string name="feedbackresponse">1-50</string>
     <string name="feedbackresponse1">1-50</string>
     <string name="feedbackresponse2">50-100</string>

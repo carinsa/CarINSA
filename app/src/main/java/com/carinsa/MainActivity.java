@@ -2,6 +2,7 @@ package com.carinsa;
 
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -10,6 +11,7 @@ import android.provider.Settings;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -74,6 +76,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import ru.dimorinny.floatingtextbutton.FloatingTextButton;
+
 import static android.widget.Toast.LENGTH_SHORT;
 import static org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER;
 
@@ -91,9 +95,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private FusedLocationProviderClient mFusedLocationClient;
     private FloatingActionButton fab;
     private FloatingActionButton navigate;
-    private FloatingActionButton avis1;
-    private FloatingActionButton avis2;
-    private FloatingActionButton avis3;
+    private FloatingTextButton avis1;
+    private FloatingTextButton avis2;
+    private FloatingTextButton avis3;
     private PopupWindow popupWindow;
     private View popupView;
     private TranslateAnimation animation;
@@ -187,9 +191,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         llBottomSheet = (LinearLayout) findViewById(R.id.bottom_fragment);
         bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
         navigate = findViewById(R.id.navigator);
-        avis1 = findViewById(R.id.avis1);
-        avis2 = findViewById(R.id.avis2);
-        avis3 = findViewById(R.id.avis3);
+
+
+
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         popupButton = (FloatingActionButton) findViewById(R.id.popupButton);
@@ -607,6 +611,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         viewContent3.setText(libre + " Personnes ont déclaré que ce parking est libre.");
         viewContent4.setText(ferme + " Personnes ont déclaré que ce parking est ferme.");
 
+        avis1 = findViewById(R.id.complet);
+
+        avis2 = findViewById(R.id.ferme);
+
+
+        avis3 = findViewById(R.id.libre);
+
+
         setupNavigation();
         setupAvisBouttons();
     }
@@ -633,48 +645,51 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private void setupAvisBouttons() {
         avis1.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
-                {
-                    Toast.makeText(MainActivity.this, "Vous êtes trop loin du parking séléctionné.", LENGTH_SHORT).show();
-                }else{
-                    if(selectedParking.getAvis().isAvisComplet()){
-                        Toast.makeText(MainActivity.this, "Votre contribution a déjà été prise en compte.", LENGTH_SHORT).show();
-                    }else{
-                        bapi.rateParking(selectedParking, 0);
-                        Toast.makeText(MainActivity.this, "Votre contribution a été prise en compte, Merci !", LENGTH_SHORT).show();
-                    }
-                }
+                    Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, merci!", Snackbar.LENGTH_SHORT).show();
+                    bapi.rateParking(selectedParking, 0);
+                    verifyAvisStatus();
+
             }
+
         });
         avis2.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
-                {
-                    Toast.makeText(MainActivity.this, "Vous êtes trop loin du parking séléctionné.", LENGTH_SHORT).show();
-                }else {
-                    if (selectedParking.getAvis().isAvisLibre()) {
-                        Toast.makeText(MainActivity.this, "Votre contribution a déjà été prise en compte", LENGTH_SHORT).show();
-                    } else {
-                        bapi.rateParking(selectedParking, 1);
-                        Toast.makeText(MainActivity.this, "Votre contribution a été prise en compte, Merci !", LENGTH_SHORT).show();
-                    }
-                }
+
+                    Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, merci!", Snackbar.LENGTH_SHORT).show();
+                    bapi.rateParking(selectedParking, 1);
+                    verifyAvisStatus();
+
+
             }
         });
         avis3.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
-                {
-                    Toast.makeText(MainActivity.this, "Vous êtes trop loin du parking séléctionné.", LENGTH_SHORT).show();
-                }else {
-                    if (selectedParking.getAvis().isAvisFerme()) {
-                        Toast.makeText(MainActivity.this, "Votre contribution a déjà été prise en compte", LENGTH_SHORT).show();
-                    } else {
-                        bapi.rateParking(selectedParking, 2);
-                        Toast.makeText(MainActivity.this, "Votre contribution a été prise en compte, Merci !", LENGTH_SHORT).show();
-                    }
-                }
+
+                Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, merci!", Snackbar.LENGTH_SHORT).show();
+                bapi.rateParking(selectedParking, 2);
+                verifyAvisStatus();
+
+
             }
         });
+    }
+
+    private void verifyAvisStatus(){
+        if(selectedParking.getAvis().isAvisComplet()) {
+            avis1.setEnabled(false);
+            avis1.setBackgroundColor(Color.parseColor("#808080"));
+        }
+
+        if(selectedParking.getAvis().isAvisFerme()) {
+            avis2.setEnabled(false);
+            avis3.setBackgroundColor(Color.parseColor("#808080"));
+
+        }
+
+        if(selectedParking.getAvis().isAvisLibre()) {
+            avis3.setEnabled(false);
+            avis3.setBackgroundColor(Color.parseColor("#808080"));
+
+        }
     }
 }
