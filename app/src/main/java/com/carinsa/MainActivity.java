@@ -601,8 +601,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (selectedParking.getAvailableSpots() != -1) {
             String str = selectedParking.getAvailableSpots() + " " + "places libres";
             viewContent.setText(str);
-        } else {
-            viewContent.setText("No information");
+        }else{
+            viewContent.setText("Pas d'information de place parking");
+
         }
         int complet = selectedParking.getAvis().getComplet();
         int libre = selectedParking.getAvis().getLibre();
@@ -648,125 +649,87 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private void setupAvisBouttons() {
         avis1.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
-                {
-                    Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
-
-                }else{
+//                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
+//                {
+//                    Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
+//
+//                }else{
                     if(selectedParking.getAvis().isAvisComplet()){
                         bapi.rateParking(selectedParking, 0);
                         Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
-                        avis1.setEnabled(false);
-                        avis1.setBackgroundColor(Color.parseColor("#808080"));
-                        avis2.setEnabled(true);
+                        avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
                         avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis3.setEnabled(true);
                         avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
                     }else{
                         bapi.rateParking(selectedParking, 0);
                         Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
-                        avis1.setEnabled(false);
-                        avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis2.setEnabled(true);
+                        avis1.setBackgroundColor(Color.parseColor("#808080"));
                         avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis3.setEnabled(true);
                         avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
                     }
-                }
+//                }
 
             }
 
         });
         avis2.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
-                {
-                    Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
-                }else{
+//                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
+//                {
+//                    Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
+//                }else{
 
                     if (selectedParking.getAvis().isAvisLibre()) {
                         bapi.rateParking(selectedParking, 1);
                         Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
-                        avis2.setEnabled(true);
-                        avis2.setBackgroundColor(Color.parseColor("#808080"));
-                        avis1.setEnabled(true);
+                        avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
                         avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis3.setEnabled(true);
                         avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
                     } else {
                         bapi.rateParking(selectedParking, 1);
                         Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
-                        avis2.setEnabled(false);
-                        avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis1.setEnabled(true);
+                        avis2.setBackgroundColor(Color.parseColor("#808080"));
                         avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis3.setEnabled(true);
                         avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
                     }
 
-                }
+//                }
 
             }
         });
         avis3.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
-                {
-                    Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
-                }else {
+//                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
+//                {
+//                    Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
+//                }else {
                     if (selectedParking.getAvis().isAvisFerme()) {
                         bapi.rateParking(selectedParking, 2);
                         Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
-                        avis3.setEnabled(true);
-                        avis3.setBackgroundColor(Color.parseColor("#808080"));
-                        avis2.setEnabled(true);
+                        avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
                         avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis1.setEnabled(true);
                         avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
                     } else {
                         bapi.rateParking(selectedParking, 2);
                         Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
-                        avis3.setEnabled(false);
-                        avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis2.setEnabled(true);
+                        avis3.setBackgroundColor(Color.parseColor("#808080"));
                         avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis1.setEnabled(true);
                         avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
                     }
-                }
+//                }
 
             }
         });
     }
 
-    private void verifyAvisStatus(){
-        if(selectedParking.getAvis().isAvisComplet()) {
-            avis1.setEnabled(false);
-            avis1.setBackgroundColor(Color.parseColor("#808080"));
-        }
 
-        if(selectedParking.getAvis().isAvisFerme()) {
-            avis2.setEnabled(false);
-            avis3.setBackgroundColor(Color.parseColor("#808080"));
-
-        }
-
-        if(selectedParking.getAvis().isAvisLibre()) {
-            avis3.setEnabled(false);
-            avis3.setBackgroundColor(Color.parseColor("#808080"));
-
-        }
-    }
     private void reinitializeButtons(){
         if(lastSelectedParking!=selectedParking) {
-            selectedParking.getAvis().setAvisComplet(true);
-            avis1.setEnabled(true);
+            selectedParking.getAvis().setAvisComplet(false);
             avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
-            selectedParking.getAvis().setAvisLibre(true);
-            avis2.setEnabled(true);
+            selectedParking.getAvis().setAvisLibre(false);
             avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
-            selectedParking.getAvis().setAvisFerme(true);
-            avis3.setEnabled(true);
+            selectedParking.getAvis().setAvisFerme(false);
             avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
         }
     }
