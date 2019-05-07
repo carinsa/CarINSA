@@ -649,11 +649,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private void setupAvisBouttons() {
         avis1.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-//                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
-//                {
-//                    Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
-//
-//                }else{
+                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
+                {
+                    Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
+
+                }else{
                     if(selectedParking.getAvis().isAvisComplet()){
                         bapi.rateParking(selectedParking, 0);
                         Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
@@ -667,17 +667,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
                         avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
                     }
-//                }
+                }
 
             }
 
         });
         avis2.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-//                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
-//                {
-//                    Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
-//                }else{
+                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
+                {
+                    Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
+                }else{
 
                     if (selectedParking.getAvis().isAvisLibre()) {
                         bapi.rateParking(selectedParking, 1);
@@ -693,16 +693,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
                     }
 
-//                }
+                }
 
             }
         });
         avis3.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-//                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
-//                {
-//                    Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
-//                }else {
+                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
+                {
+                    Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
+                }else {
                     if (selectedParking.getAvis().isAvisFerme()) {
                         bapi.rateParking(selectedParking, 2);
                         Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
@@ -716,7 +716,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
                         avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
                     }
-//                }
+                }
 
             }
         });
