@@ -99,12 +99,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private double lastLat;
     private double lastLong;
 
+
     private static final int MULTIPLE_PERMISSION_REQUEST_CODE = 4;
     private final Handler handler = new Handler();
 
     private ArrayList<Marker> markers = new ArrayList<Marker>();
     private Marker destination = null;
     private Marker selected = null;
+    private FloatingActionButton popupButton;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -185,6 +188,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         avis2 = findViewById(R.id.avis2);
         avis3 = findViewById(R.id.avis3);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+        popupButton = (FloatingActionButton) findViewById(R.id.popupButton);
+
+        popupButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                popParking();
+            }
+        });
+
+
         fab = findViewById(R.id.fab);
         map = findViewById(R.id.map);
         map.getZoomController().setVisibility(NEVER);
@@ -515,19 +528,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
     }
+    public void popParking(){
 
-    public void popParking(Parking p) {
 
         popupView = View.inflate(this, R.layout.popup, null);
-        popupWindow = new PopupWindow(popupView, WindowManager.LayoutParams.MATCH_PARENT,
+        popupWindow = new PopupWindow(popupView, 900,
                 WindowManager.LayoutParams.WRAP_CONTENT);
-        TextView tv = popupView.findViewById(R.id.position);
-        if (p.getAvailableSpots() != -1) {
-            tv.setText(p.getName() + "\n" + p.getAvailableSpots() + " places libres");
-        } else {
-            tv.setText(p.getName());
-        }
-        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+
+//        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+
         popupWindow.setFocusable(true);
 
         popupWindow.setOutsideTouchable(true);
@@ -537,7 +546,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         animation.setInterpolator(new AccelerateInterpolator());
         animation.setDuration(200);
 
-        popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 10, 10);
+        popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 0, 500);
         popupView.startAnimation(animation);
 
 
