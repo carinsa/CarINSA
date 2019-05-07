@@ -47,18 +47,105 @@
 
     </RelativeLayout>>
 
-
+    <RelativeLayout
+        android:id="@+id/text_bottom"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
         <TextView
 
-        android:layout_width="match_parent"
-        android:id="@+id/bottom_content"
-        android:layout_height="match_parent"
-        android:background="#00E0DADA"
-        android:gravity="center"
-        android:text="@string/bottom_sheet_content"
-        android:textColor="@android:color/white" />
+            android:id="@+id/bottom_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="#00E0DADA"
+            android:gravity="center_horizontal"
+            android:text="@string/bottom_sheet_content"
+            android:textColor="@android:color/white" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="85dp"
+            android:layout_marginLeft="22dp"
+            android:gravity="center_horizontal">
 
 
+        <TextView
+            android:layout_marginHorizontal="10dp"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#00E0DADA"
+            android:text="Parking libre"
+            android:textColor="@android:color/white" />
 
+            <TextView
+                android:layout_marginHorizontal="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#00E0DADA"
+                android:text="Parking plein"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_weight="1"
+                android:background="#00E0DADA"
+                android:text="Parking Férmé"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_horizontal">
+
+
+            <android.support.design.widget.FloatingActionButton
+
+                android:id="@+id/avis1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="35dp"
+                android:layout_marginVertical="8dp"
+                android:src="@drawable/navigator"
+                android:tint="@android:color/black"
+                android:layout_gravity="center"
+                app:backgroundTint="@android:color/holo_green_dark" />
+
+            <android.support.design.widget.FloatingActionButton
+
+                android:id="@+id/avis2"
+
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="35dp"
+                android:layout_marginVertical="8dp"
+                android:layout_weight="1"
+                android:src="@drawable/libre"
+                app:backgroundTint="@android:color/holo_green_dark" />
+
+            <android.support.design.widget.FloatingActionButton
+
+                android:id="@+id/avis3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="35dp"
+                android:layout_marginVertical="8dp"
+                android:layout_weight="1"
+                android:src="@drawable/plein"
+                app:backgroundTint="@android:color/holo_green_dark" />
+        </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

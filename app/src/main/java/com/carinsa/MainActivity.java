@@ -86,6 +86,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private FusedLocationProviderClient mFusedLocationClient;
     private FloatingActionButton fab;
     private FloatingActionButton navigate;
+    private FloatingActionButton avis1;
+    private FloatingActionButton avis2;
+    private FloatingActionButton avis3;
     private PopupWindow popupWindow;
     private View popupView;
     private TranslateAnimation animation;
@@ -174,6 +177,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         llBottomSheet = (LinearLayout) findViewById(R.id.bottom_fragment);
         bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
+        navigate= findViewById(R.id.navigator);
+        avis1 = findViewById(R.id.avis1);
+        avis2 = findViewById(R.id.avis2);
+        avis3 = findViewById(R.id.avis3);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
 
@@ -293,8 +300,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public boolean onMarkerClick(Marker marker,
                                          MapView mapView) {
-                selectMarker(marker,mapView);
 
+                
+                selectMarker(marker,mapView);
 //                popParking(parking);
 
 //                Log.e("tap", parking.toString());
@@ -572,8 +580,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     viewContent.setText("No information");
                 }
                 navigate= findViewById(R.id.navigator);
-                navigate.setOnClickListener(new OnClickListener() {
+      navigate.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
+                        setupNavigation();
+                        setupAvisBouttons();
+
+                    }
+                    private void setupNavigation(){
                         String label = parking.getName();
                         String uriBegin = "google.navigation:q=";
                         String query = lastLat + "," + lastLong + "(" + label + ")";
@@ -588,8 +601,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         if (isIntentSafe) {
                             startActivity(mapIntent);
                         }
+                    }
+                    private void setupAvisBouttons() {
+                        avis1.setOnClickListener(new OnClickListener() {
+                            public void onClick(View v) {
 
+                            }
+                        });
+                        avis2.setOnClickListener(new OnClickListener() {
+                            public void onClick(View v) {
+
+                            }
+                        });
+                        avis3.setOnClickListener(new OnClickListener() {
+                            public void onClick(View v) {
+
+                            }
+                        });
                     }
                 });
-    }
+                 }
 }
