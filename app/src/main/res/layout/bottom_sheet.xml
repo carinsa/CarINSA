@@ -47,18 +47,116 @@
 
     </RelativeLayout>>
 
+    <RelativeLayout
+        android:id="@+id/text_bottom"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        >
 
         <TextView
 
-        android:layout_width="match_parent"
-        android:id="@+id/bottom_content"
-        android:layout_height="match_parent"
-        android:background="#00E0DADA"
-        android:gravity="center"
-        android:text="@string/bottom_sheet_content"
-        android:textColor="@android:color/white" />
+            android:id="@+id/bottom_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="14dp"
+            android:background="#00E0DADA"
+            android:gravity="center_horizontal"
+            android:text="@string/bottom_sheet_content"
+            android:textColor="@android:color/white" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/bottom_content"
+            android:layout_alignLeft="@+id/bottom_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="166dp"
+            android:layout_marginLeft="166dp"
+            android:layout_marginTop="133dp"
+            android:background="#00E0DADA"
+            android:text="Parking libre"
+            android:textColor="@android:color/white" />
 
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/bottom_content"
+            android:layout_alignLeft="@+id/bottom_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="288dp"
+            android:layout_marginLeft="288dp"
+            android:layout_marginTop="133dp"
+            android:background="#00E0DADA"
+            android:text="Parking plein"
+            android:textColor="@android:color/white" />
 
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/bottom_content"
+            android:layout_alignLeft="@+id/bottom_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="47dp"
+            android:layout_marginLeft="47dp"
+            android:layout_marginTop="133dp"
+            android:background="#00E0DADA"
+            android:text="Parking Férmé"
+            android:textColor="@android:color/white" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp">
+
+            <android.support.design.widget.FloatingActionButton
+
+                android:id="@+id/avis1"
+                android:layout_width="68dp"
+                android:layout_height="79dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="61dp"
+                android:layout_marginLeft="61dp"
+                android:layout_marginTop="163dp"
+                android:layout_weight="1"
+                android:src="@drawable/navigator"
+                android:tint="@android:color/black"
+                app:backgroundTint="@android:color/holo_green_dark" />
+
+            <android.support.design.widget.FloatingActionButton
+
+                android:id="@+id/avis2"
+                android:layout_width="68dp"
+                android:layout_height="79dp"
+                android:layout_alignBottom="@+id/bottom_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="180dp"
+                android:layout_marginLeft="180dp"
+                android:layout_marginTop="163dp"
+                android:layout_marginBottom="24dp"
+                android:layout_weight="1"
+                android:src="@drawable/libre"
+                app:backgroundTint="@android:color/holo_green_dark" />
+
+            <android.support.design.widget.FloatingActionButton
+
+                android:id="@+id/avis3"
+                android:layout_width="68dp"
+                android:layout_height="79dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="302dp"
+                android:layout_marginLeft="302dp"
+                android:layout_marginTop="163dp"
+                android:layout_weight="1"
+                android:src="@drawable/plein"
+                app:backgroundTint="@android:color/holo_green_dark" />
+        </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>
