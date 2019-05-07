@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le :  mar. 07 mai 2019 à 15:18
+-- Généré le :  mar. 07 mai 2019 à 15:54
 -- Version du serveur :  10.1.36-MariaDB
 -- Version de PHP :  7.2.11
 
@@ -57,7 +57,7 @@ CREATE TABLE `parking_state` (
 
 CREATE TABLE `rating` (
   `id` int(11) NOT NULL,
-  `pkgid` int(11) NOT NULL,
+  `pkgid` varchar(32) NOT NULL,
   `userid` varchar(32) NOT NULL,
   `state` int(11) NOT NULL,
   `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP

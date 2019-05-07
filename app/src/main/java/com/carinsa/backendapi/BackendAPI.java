@@ -26,15 +26,14 @@ import java.util.List;
 public class BackendAPI {
     private static List<String> adresses = new ArrayList<>();
     private Parking[] parkings;
-    private Parking[] spots;
     private RequestQueue rq;
     private String uid;
     private int fetchStatus=-1;
     private Runnable callback;
-    private static final String URL_GETPARKINGS = "http://10.43.5.244/DEV/parkings/getParkings.php";
-    private static final String URL_RATEPARKING = "http://10.43.5.244/DEV/parkings/setRating.php";
-    private static final String URL_GETSPOTS = "http://10.43.5.244/DEV/parkings/getUserSpots.php";
-    private static final String URL_ADDSPOT = "http://10.43.5.244/DEV/parkings/assUserSpots.php";
+    private static final String URL_GETPARKINGS = "http://10.43.0.17/DEV/parkings/getParkings.php";
+    private static final String URL_RATEPARKING = "http://10.43.0.17/DEV/parkings/setRating.php";
+    private static final String URL_GETSPOTS = "http://10.43.0.17/DEV/parkings/getUserSpots.php";
+    private static final String URL_ADDSPOT = "http://10.43.0.17/DEV/parkings/assUserSpots.php";
 
     public BackendAPI(RequestQueue rq,String uid){
         this.rq=rq;
@@ -43,7 +42,6 @@ public class BackendAPI {
 
     public void fetchParkings(final Runnable callback){
         this.callback=callback;
-        Log.e("callback",callback.toString());
         fetchStatus=0;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_GETPARKINGS+"?u="+uid, null, new Response.Listener<JSONObject>() {
             @Override
@@ -84,7 +82,7 @@ public class BackendAPI {
                             try {
                                 Log.e("json",response.toString());
                                 JSONArray values=response.getJSONArray("spots");
-                                spots = new Parking[values.length()];
+                                Parking[] spots = new Parking[values.length()];
                                 for (int i = 0; i < values.length(); i++) {
                                     JSONObject object = values.getJSONObject(i);
                                     String spotid=object.getString("spotid");
@@ -95,8 +93,27 @@ public class BackendAPI {
 
                                     Parking s = new Parking(spotid,name,lat,lng,-1);
                                     s.setSpot(true);
+
+                                    JSONObject avisObj = object.getJSONObject("ratings");
+                                    int complet=avisObj.getInt("full");
+                                    int libre=avisObj.getInt("available");
+                                    int ferme=avisObj.getInt("close");
+                                    int ouvert=avisObj.getInt("open");
+
+                                    avisObj = object.getJSONObject("my-ratings");
+                                    boolean avisComplet=avisObj.getBoolean("full");
+                                    boolean avisLibre=avisObj.getBoolean("available");
+                                    boolean avisFerme=avisObj.getBoolean("close");
+                                    boolean avisOuvert=avisObj.getBoolean("open");
+
+                                    Avis avis=new Avis(complet,libre,ferme,ouvert,avisComplet,avisLibre,avisFerme,avisOuvert);
+                                    s.setAvis(avis);
+
                                     spots[i]=s;
                                 }
+                                Parking[] ps=combine(parkings,spots);
+                                parkings=ps;
+
                                 fetchStatus=1;
                                 callback.run();
                             } catch (JSONException e) {
@@ -123,6 +140,13 @@ public class BackendAPI {
 
         rq.add(jsonObjectRequest);
 
+    }
+    private static Parking[] combine(Parking[] a, Parking[] b){
+        int length = a.length + b.length;
+        Parking[] result = new Parking[length];
+        System.arraycopy(a, 0, result, 0, a.length);
+        System.arraycopy(b, 0, result, a.length, b.length);
+        return result;
     }
     public int fetchStatus() {
         return fetchStatus;
@@ -200,8 +224,8 @@ public class BackendAPI {
             }
         }
     }
-    public void addSpot(double lat, double lng){
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_ADDSPOT+"?u="+uid+"&lat="+lat+"&lng="+lng, null, new Response.Listener<JSONObject>() {
+    public void addSpot(double lat, double lng, int type, boolean free, int available){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_ADDSPOT+"?u="+uid+"&lat="+lat+"&lng="+lng+"&free="+free+"&available="+available+"&type="+type, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.e("json",response.toString());
@@ -218,9 +242,6 @@ public class BackendAPI {
     public Parking[] getAllParkings() {
         return parkings;
     }
-    public Parking[] getAllSpots() {
-        return spots;
-    }
 
     public Parking[] getParkings(double lat, double lng, int radius) {
         Parking[] park_temp = new Parking[parkings.length];
@@ -236,22 +257,6 @@ public class BackendAPI {
             park_ret[i] = park_temp[i];
         }
         return park_ret;
-
-    }
-    public Parking[] getSpots(double lat, double lng, int radius) {
-        Parking[] spot_temp = new Parking[spots.length];
-        int size = 0;
-        for (int i = 0; i < spots.length; i++) {
-            if (distance(lat, lng, spots[i].getLat(), spots[i].getLng()) <= radius) {
-                spot_temp[size] = spots[i];
-                size++;
-            }
-        }
-        Parking[] spot_ret = new Parking[size];
-        for (int i = 0; i < size; i++) {
-            spot_ret[i] = spot_temp[i];
-        }
-        return spot_ret;
 
     }
 
