@@ -82,7 +82,19 @@
         app:layout_anchor="@+id/dummy"
         app:layout_anchorGravity="top|end" />
 
+    <android.support.design.widget.FloatingActionButton
 
+        android:id="@+id/popupButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="300dp"
+        android:layout_marginBottom="50dp"
+        android:paddingBottom="20dp"
+        android:src="@drawable/cursor"
+        android:tint="@android:color/black"
+        app:backgroundTint="@android:color/holo_blue_dark"
+        app:layout_anchor="@+id/dummy"
+        app:layout_anchorGravity="top|end" />
 
 
     </android.support.design.widget.CoordinatorLayout>

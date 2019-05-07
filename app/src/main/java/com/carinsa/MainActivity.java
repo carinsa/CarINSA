@@ -1,4 +1,5 @@
 package com.carinsa;
+
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.BitmapDrawable;
@@ -77,6 +78,7 @@ import static org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    private Parking selectedParking = null;
     private AutoCompleteTextView searchBar;
     private MapView map = null;
     private MyItemizedOverlay myItemizedOverlay = null;
@@ -87,13 +89,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private FusedLocationProviderClient mFusedLocationClient;
     private FloatingActionButton fab;
     private FloatingActionButton navigate;
+    private FloatingActionButton avis1;
+    private FloatingActionButton avis2;
+    private FloatingActionButton avis3;
     private PopupWindow popupWindow;
     private View popupView;
     private TranslateAnimation animation;
-    private  BottomSheetBehavior bottomSheetBehavior;
+    private BottomSheetBehavior bottomSheetBehavior;
     private LinearLayout llBottomSheet;
     private double lastLat;
     private double lastLong;
+
 
     private static final int MULTIPLE_PERMISSION_REQUEST_CODE = 4;
     private final Handler handler = new Handler();
@@ -101,6 +107,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private ArrayList<Marker> markers = new ArrayList<Marker>();
     private Marker destination = null;
     private Marker selected = null;
+    private FloatingActionButton popupButton;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -175,9 +184,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         llBottomSheet = (LinearLayout) findViewById(R.id.bottom_fragment);
         bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
+        navigate = findViewById(R.id.navigator);
+        avis1 = findViewById(R.id.avis1);
+        avis2 = findViewById(R.id.avis2);
+        avis3 = findViewById(R.id.avis3);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
+        popupButton = (FloatingActionButton) findViewById(R.id.popupButton);
 
+        popupButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                popParking();
+            }
+        });
 
 
         fab = findViewById(R.id.fab);
@@ -190,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Log.e("MapView", "normal click");
                 return true;
             }
+
             public boolean longPressHelper(GeoPoint p) {
                 Log.e("MapView", "long click");
                 return false;
@@ -266,8 +286,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void run() {
                 Parking[] parkings = bapi.getAllParkings();
-                for(int i=0;i<parkings.length;i++){
-                    Log.e("p",parkings[i].toString());
+                for (int i = 0; i < parkings.length; i++) {
+                    Log.e("p", parkings[i].toString());
                     addMarker(parkings[i]);
                 }
                 Parking[] spots = bapi.getAllSpots();
@@ -300,8 +320,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public boolean onMarkerClick(Marker marker,
                                          MapView mapView) {
-                selectMarker(marker,mapView);
 
+
+                selectMarker(marker, mapView);
 //                popParking(parking);
 
 //                Log.e("tap", parking.toString());
@@ -311,16 +332,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         parkingMarker.setPosition(parkingGeo);
         parkingMarker.setRelatedObject(p);
 
-        if(p.isSpot()) {
-            parkingMarker.setIcon(getResources().getDrawable(R.drawable.markeruser50));
-        }
-        else if(p.getAvailableSpots()>0) {
+        if (p.getAvailableSpots() > 0) {
             parkingMarker.setIcon(getResources().getDrawable(R.drawable.markeravailable50));
-        }
-        else if(p.getAvailableSpots()==0) {
+        } else if (p.getAvailableSpots() == 0) {
             parkingMarker.setIcon(getResources().getDrawable(R.drawable.markerfull50));
-        }
-        else {
+        } else {
             parkingMarker.setIcon(getResources().getDrawable(R.drawable.markerunknown50));
         }
         map.getOverlays().add(parkingMarker);
@@ -434,33 +450,35 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onClick(View v) {
                 double[] coords = getLocationFromAddress(autoComplete.getText().toString());
                 if (coords != null) {
-                    if(destination!=null){
+                    if (destination != null) {
                         destination.remove(map);
                     }
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-
                     Parking p = bapi.getClosestAvailableParking(coords[0], coords[1], 1000);
-                    Parking[] ps = bapi.getParkings(coords[0], coords[1], 1000);
-                    GeoPoint address = new GeoPoint(p.getLat(), p.getLng());
-                    Marker m=null;
                     IMapController mapController = map.getController();
-                    for(int i=0;i<markers.size();i++){
-                        Parking park= (Parking) markers.get(i).getRelatedObject();
-                        if(park==null){
-                            continue;
-                        }
-                        if(park.toString().equals(p.toString())){
-                            m=markers.get(i);
-                        }
-                    }
-                    if(m!=null) {
-                        selectMarker(m, map);
-                    }
-                    else {
-                        mapController.animateTo(address);
-                    }
+                    if(p == null)
+                    {
+                        mapController.animateTo(new GeoPoint(coords[0], coords[1]));
+                    }else{
+                        GeoPoint address = new GeoPoint(p.getLat(), p.getLng());
+                        Marker m = null;
 
+                        for (int i = 0; i < markers.size(); i++) {
+                            Parking park = (Parking) markers.get(i).getRelatedObject();
+                            if (park == null) {
+                                continue;
+                            }
+                            if (park.toString().equals(p.toString())) {
+                                m = markers.get(i);
+                            }
+                        }
+                        if (m != null) {
+                            selectMarker(m, map);
+                        } else {
+                            mapController.animateTo(address);
+                        }
+                    }
 
 
 
@@ -473,14 +491,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                     destination.setPosition(parkingGeo);
                     destination.setIcon(getResources().getDrawable(R.drawable.markerdestination50));
-                    /*destination.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    destination.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker,
                                                      MapView mapView) {
-                            mapView.getOverlayManager().remove(marker);
+                            //TODO
                             return true;
                         }
-                    });*/
+                    });
                     map.getOverlays().add(destination);
                     markers.add(destination);
 
@@ -517,21 +535,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
 
 
-
     }
-    public void popParking(Parking p){
+    public void popParking(){
+
 
         popupView = View.inflate(this, R.layout.popup, null);
-        popupWindow = new PopupWindow(popupView, WindowManager.LayoutParams.MATCH_PARENT,
+        popupWindow = new PopupWindow(popupView, 900,
                 WindowManager.LayoutParams.WRAP_CONTENT);
-        TextView tv = popupView.findViewById(R.id.position);
-        if(p.getAvailableSpots()!=-1) {
-            tv.setText(p.getName() + "\n" + p.getAvailableSpots()+" places libres");
-        }
-        else {
-            tv.setText(p.getName());
-        }
-        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+
+//        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+
         popupWindow.setFocusable(true);
 
         popupWindow.setOutsideTouchable(true);
@@ -541,66 +554,111 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         animation.setInterpolator(new AccelerateInterpolator());
         animation.setDuration(200);
 
-        popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 10, 10);
+        popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 0, 500);
         popupView.startAnimation(animation);
 
 
-
     }
-    public void selectMarker(Marker marker,MapView mapView){
-        if(selected!=null){
+
+    public void selectMarker(Marker marker, MapView mapView) {
+        if (selected != null) {
             Parking p = (Parking) selected.getRelatedObject();
-            if(p.getAvailableSpots()>0){
+            if (p.getAvailableSpots() > 0) {
                 selected.setIcon(getResources().getDrawable(R.drawable.markeravailable50));
-            }
-            else if(p.getAvailableSpots()==0){
+            } else if (p.getAvailableSpots() == 0) {
                 selected.setIcon(getResources().getDrawable(R.drawable.markerfull50));
-            }
-            else {
+            } else {
                 selected.setIcon(getResources().getDrawable(R.drawable.markerunknown50));
             }
         }
-        selected=marker;
+        selected = marker;
         selected.setIcon(getResources().getDrawable(R.drawable.markerselected50));
-        final Parking parking = (Parking) marker.getRelatedObject();
-        mapView.getController().animateTo(new GeoPoint(parking.getLat(), parking.getLng()));
-        lastLong = parking.getLng();
-                lastLat = parking.getLat();
-                mapView.getController().animateTo(new GeoPoint(lastLat, lastLong));
 
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        selectedParking = (Parking) marker.getRelatedObject();
+        mapView.getController().animateTo(new GeoPoint(selectedParking.getLat(), selectedParking.getLng()));
+
+        lastLong = selectedParking.getLng();
+        lastLat = selectedParking.getLat();
+        mapView.getController().animateTo(new GeoPoint(lastLat, lastLong));
+
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
 
-                TextView viewPeek = llBottomSheet.findViewById(R.id.bottom_peek);
-                TextView viewContent = llBottomSheet.findViewById(R.id.bottom_content);
+        TextView viewPeek = llBottomSheet.findViewById(R.id.bottom_peek);
+        TextView viewContent = llBottomSheet.findViewById(R.id.bottom_content);
+        TextView viewContent2 = llBottomSheet.findViewById(R.id.bottom_content2);
+        TextView viewContent3 = llBottomSheet.findViewById(R.id.bottom_content3);
+        TextView viewContent4 = llBottomSheet.findViewById(R.id.bottom_content4);
 
-                viewPeek.setText(parking.getName());
-                if(parking.getAvailableSpots()!=-1) {
-                    String str = parking.getAvailableSpots()+" "+"places libres";
-                    viewContent.setText(str);
+        viewPeek.setText(selectedParking.getName());
+        if (selectedParking.getAvailableSpots() != -1) {
+            String str = selectedParking.getAvailableSpots() + " " + "places libres";
+            viewContent.setText(str);
+        } else {
+            viewContent.setText("No information");
+        }
+        int complet = selectedParking.getAvis().getComplet();
+        int libre = selectedParking.getAvis().getLibre();
+        int ferme = selectedParking.getAvis().getFerme();
+
+        viewContent2.setText(complet + " Personnes ont déclaré que ce parking est complet.");
+        viewContent3.setText(libre + " Personnes ont déclaré que ce parking est libre.");
+        viewContent4.setText(ferme + " Personnes ont déclaré que ce parking est ferme.");
+
+        setupNavigation();
+        setupAvisBouttons();
+    }
+    private void setupNavigation() {
+        navigate.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                String label = selectedParking.getName();
+                String uriBegin = "google.navigation:q=";
+                String query = lastLat + "," + lastLong + "(" + label + ")";
+                String encodedQuery = Uri.encode(query);
+                String uriString = uriBegin + encodedQuery;
+                Uri uri = Uri.parse(uriString);
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, uri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                PackageManager packageManager = getPackageManager();
+                List<ResolveInfo> activities = packageManager.queryIntentActivities(mapIntent, 0);
+                boolean isIntentSafe = activities.size() > 0;
+                if (isIntentSafe) {
+                    startActivity(mapIntent);
                 }
-                else {
-                    viewContent.setText("No information");
+            }
+        });
+    }
+    private void setupAvisBouttons() {
+        avis1.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if(selectedParking.getAvis().isAvisComplet()){
+                    Toast.makeText(MainActivity.this, "Votre contribution a déjà été prise en compte", LENGTH_SHORT).show();
+                }else{
+                    bapi.rateParking(selectedParking, 0);
+                    Toast.makeText(MainActivity.this, "Votre contribution a été prise en compte, Merci !", LENGTH_SHORT).show();
                 }
-                navigate= findViewById(R.id.navigator);
-                navigate.setOnClickListener(new OnClickListener() {
-                    public void onClick(View v) {
-                        String label = parking.getName();
-                        String uriBegin = "google.navigation:q=";
-                        String query = lastLat + "," + lastLong + "(" + label + ")";
-                        String encodedQuery = Uri.encode(query);
-                        String uriString = uriBegin  + encodedQuery ;
-                        Uri uri = Uri.parse(uriString);
-                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, uri);
-                        mapIntent.setPackage("com.google.android.apps.maps");
-                        PackageManager packageManager = getPackageManager();
-                        List<ResolveInfo> activities = packageManager.queryIntentActivities(mapIntent, 0);
-                        boolean isIntentSafe = activities.size() > 0;
-                        if (isIntentSafe) {
-                            startActivity(mapIntent);
-                        }
+            }
+        });
+        avis2.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if(selectedParking.getAvis().isAvisLibre()){
+                    Toast.makeText(MainActivity.this, "Votre contribution a déjà été prise en compte", LENGTH_SHORT).show();
+                }else{
+                    bapi.rateParking(selectedParking, 1);
+                    Toast.makeText(MainActivity.this, "Votre contribution a été prise en compte, Merci !", LENGTH_SHORT).show();
+                }
+            }
+        });
+        avis3.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if(selectedParking.getAvis().isAvisFerme()){
+                    Toast.makeText(MainActivity.this, "Votre contribution a déjà été prise en compte", LENGTH_SHORT).show();
+                }else{
+                    bapi.rateParking(selectedParking, 2);
+                    Toast.makeText(MainActivity.this, "Votre contribution a été prise en compte, Merci !", LENGTH_SHORT).show();
+                }
 
-                    }
-                });
+            }
+        });
     }
 }
