@@ -11,6 +11,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.carinsa.model.Avis;
 import com.carinsa.model.Parking;
+import com.carinsa.model.Place;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,12 +27,15 @@ import java.util.List;
 public class BackendAPI {
     private static List<String> adresses = new ArrayList<>();
     private Parking[] parkings;
+    private Place[] spots;
     private RequestQueue rq;
     private String uid;
     private int fetchStatus=-1;
     private Runnable callback;
-    private static final String URL_GETPARKINGS = "http://192.168.1.56/smart/getParkings.php";
-    private static final String URL_RATEPARKING = "http://192.168.1.56/smart/setRating.php";
+    private static final String URL_GETPARKINGS = "http://10.44.5.149/DEV/parkings/getParkings.php";
+    private static final String URL_RATEPARKING = "http://10.44.5.149/DEV/parkings/setRating.php";
+    private static final String URL_GETSPOTS = "http://10.44.5.149/DEV/parkings/getUserSpots.php";
+    private static final String URL_ADDSPOT = "http://10.44.5.149/DEV/parkings/assUserSpots.php";
 
     public BackendAPI(RequestQueue rq,String uid){
         this.rq=rq;
@@ -82,6 +86,37 @@ public class BackendAPI {
                 }
             }
             }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("json",error.toString());
+            }
+        });
+        JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET, URL_GETSPOTS+"?u="+uid, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    Log.e("json",response.toString());
+                    JSONArray values=response.getJSONArray("spots");
+                    spots = new Place[values.length()];
+                    for (int i = 0; i < values.length(); i++) {
+                        JSONObject object = values.getJSONObject(i);
+                        String spotid=object.getString("spotid");
+                        String name=object.getString("name");
+                        Double lat=object.getDouble("lat");
+                        Double lng=object.getDouble("lng");
+                        int nb=object.getInt("nb");
+
+                        Place s = new Place(spotid,name,lat,lng,nb);
+
+                        spots[i]=s;
+                    }
+                    fetchStatus=1;
+                    callback.run();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("json",error.toString());
