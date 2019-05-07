@@ -45,7 +45,7 @@
             android:tint="@android:color/black"
             app:backgroundTint="@android:color/holo_green_dark" />
 
-    </RelativeLayout>>
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/text_bottom"
