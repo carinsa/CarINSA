@@ -11,6 +11,7 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.Manifest;
@@ -30,6 +31,7 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private Parking selectedParking = null;
     private AutoCompleteTextView searchBar;
+    private ImageButton boutonRecherche;
     private MapView map = null;
     private MyItemizedOverlay myItemizedOverlay = null;
     private MyLocationNewOverlay myLocationOverlay = null;
@@ -253,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 return true;
             }
 
-
             private void callSearch(String query) {
                 Log.e("1", query);
             }
@@ -423,24 +425,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         String[] tableauString = bapi.getAdresses();
 
         //On récupère l'AutoCompleteTextView que l'on a créé dans le fichier main.xml
-        final AutoCompleteTextView autoComplete = (AutoCompleteTextView) findViewById(R.id.search_view);
+        searchBar = (AutoCompleteTextView) findViewById(R.id.search_view);
 
         //On récupère le bouton que l'on a créé dans le fichier main.xml
-        ImageButton boutonRecherche = (ImageButton) findViewById(R.id.ButtonEnvoyer);
+        boutonRecherche = (ImageButton) findViewById(R.id.ButtonEnvoyer);
 
-        //On crée la liste d'autocomplétion à partir de notre tableau de string appelé tableauString
-        //android.R.layout.simple_dropdown_item_1line permet de définir le style d'affichage de la liste
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, tableauString);
-
-        //On affecte cette liste d'autocomplétion à notre objet d'autocomplétion
-        autoComplete.setAdapter(adapter);
-
-        //Enfin on rajoute un petit écouteur d'évènement sur le bouton pour afficher
-        //dans un Toast ce que l'on a rentré dans notre AutoCompleteTextView
+        //Event sur le bouton recherche
         boutonRecherche.setOnClickListener(new OnClickListener() {
 
             public void onClick(View v) {
-                double[] coords = getLocationFromAddress(autoComplete.getText().toString());
+                double[] coords = getLocationFromAddress(searchBar.getText().toString());
                 if (coords != null) {
                     if (destination != null) {
                         destination.remove(map);
@@ -452,6 +446,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     if(p == null)
                     {
                         mapController.animateTo(new GeoPoint(coords[0], coords[1]));
+                        Toast.makeText(MainActivity.this, "Aucun Parking proche libre trouvé.", LENGTH_SHORT).show();
                     }else{
                         GeoPoint address = new GeoPoint(p.getLat(), p.getLng());
                         Marker m = null;
@@ -467,16 +462,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         }
                         if (m != null) {
                             selectMarker(m, map);
+                            TextView viewPeek = llBottomSheet.findViewById(R.id.bottom_peek);
+                            viewPeek.setText("Parking proche : " + selectedParking.getName());
                         } else {
+                            Toast.makeText(MainActivity.this, searchBar.getText(), LENGTH_SHORT).show();
                             mapController.animateTo(address);
                         }
                     }
-
-
-
-                    //mapController.setZoom(15);
-                    //map.zoomToBoundingBox(boundingBox, true);
-
 
                     GeoPoint parkingGeo = new GeoPoint(coords[0], coords[1]);
                     destination = new Marker(map);
@@ -493,14 +485,30 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     });
                     map.getOverlays().add(destination);
                     markers.add(destination);
-
-                    //mapController.animateTo(new GeoPoint(p.getLat(),p.getLng()));
-                    Toast.makeText(MainActivity.this, autoComplete.getText(), LENGTH_SHORT).show();
                 } else {
                     //TODO
                 }
             }
         });
+
+        //On crée la liste d'autocomplétion à partir de notre tableau de string appelé tableauString
+        //android.R.layout.simple_dropdown_item_1line permet de définir le style d'affichage de la liste
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, tableauString);
+
+        //On affecte cette liste d'autocomplétion à notre objet d'autocomplétion
+        searchBar.setAdapter(adapter);
+        //Event sur le bouton ok de la searchbar
+        searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    boutonRecherche.callOnClick();
+                }
+                return false;
+            }
+        });
+        //Enfin on rajoute un petit écouteur d'évènement sur le bouton pour afficher
+        //dans un Toast ce que l'on a rentré dans notre AutoCompleteTextView
+
     }
 
     public double[] getLocationFromAddress(String strAddress) {
@@ -622,33 +630,47 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private void setupAvisBouttons() {
         avis1.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(selectedParking.getAvis().isAvisComplet()){
-                    Toast.makeText(MainActivity.this, "Votre contribution a déjà été prise en compte", LENGTH_SHORT).show();
+                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
+                {
+                    Toast.makeText(MainActivity.this, "Vous êtes trop loin du parking séléctionné.", LENGTH_SHORT).show();
                 }else{
-                    bapi.rateParking(selectedParking, 0);
-                    Toast.makeText(MainActivity.this, "Votre contribution a été prise en compte, Merci !", LENGTH_SHORT).show();
+                    if(selectedParking.getAvis().isAvisComplet()){
+                        Toast.makeText(MainActivity.this, "Votre contribution a déjà été prise en compte.", LENGTH_SHORT).show();
+                    }else{
+                        bapi.rateParking(selectedParking, 0);
+                        Toast.makeText(MainActivity.this, "Votre contribution a été prise en compte, Merci !", LENGTH_SHORT).show();
+                    }
                 }
             }
         });
         avis2.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(selectedParking.getAvis().isAvisLibre()){
-                    Toast.makeText(MainActivity.this, "Votre contribution a déjà été prise en compte", LENGTH_SHORT).show();
-                }else{
-                    bapi.rateParking(selectedParking, 1);
-                    Toast.makeText(MainActivity.this, "Votre contribution a été prise en compte, Merci !", LENGTH_SHORT).show();
+                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
+                {
+                    Toast.makeText(MainActivity.this, "Vous êtes trop loin du parking séléctionné.", LENGTH_SHORT).show();
+                }else {
+                    if (selectedParking.getAvis().isAvisLibre()) {
+                        Toast.makeText(MainActivity.this, "Votre contribution a déjà été prise en compte", LENGTH_SHORT).show();
+                    } else {
+                        bapi.rateParking(selectedParking, 1);
+                        Toast.makeText(MainActivity.this, "Votre contribution a été prise en compte, Merci !", LENGTH_SHORT).show();
+                    }
                 }
             }
         });
         avis3.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(selectedParking.getAvis().isAvisFerme()){
-                    Toast.makeText(MainActivity.this, "Votre contribution a déjà été prise en compte", LENGTH_SHORT).show();
-                }else{
-                    bapi.rateParking(selectedParking, 2);
-                    Toast.makeText(MainActivity.this, "Votre contribution a été prise en compte, Merci !", LENGTH_SHORT).show();
+                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
+                {
+                    Toast.makeText(MainActivity.this, "Vous êtes trop loin du parking séléctionné.", LENGTH_SHORT).show();
+                }else {
+                    if (selectedParking.getAvis().isAvisFerme()) {
+                        Toast.makeText(MainActivity.this, "Votre contribution a déjà été prise en compte", LENGTH_SHORT).show();
+                    } else {
+                        bapi.rateParking(selectedParking, 2);
+                        Toast.makeText(MainActivity.this, "Votre contribution a été prise en compte, Merci !", LENGTH_SHORT).show();
+                    }
                 }
-
             }
         });
     }

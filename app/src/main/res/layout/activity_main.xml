@@ -25,7 +25,9 @@
             android:layout_marginRight="8dp"
             app:layout_constraintEnd_toStartOf="@+id/ButtonEnvoyer"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:inputType="text"
+            android:completionThreshold="1"/>
 
         <ImageButton
             android:id="@+id/ButtonEnvoyer"
