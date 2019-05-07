@@ -1,5 +1,7 @@
 package com.carinsa.model;
 
+import android.location.Location;
+
 public class Parking {
     private boolean isSpot=false;
     private String pkgid;
@@ -63,5 +65,22 @@ public class Parking {
     public String toString() {
         String ret=name+" "+lat+" "+lng+" "+availableSpots;
         return ret;
+    }
+
+    public boolean isFarFrom(double latitude, double longitude, float distance) {
+        Location parkingLoc = new Location("");
+        parkingLoc.setLatitude(this.lat);
+        parkingLoc.setLongitude(this.lng);
+
+        Location loc = new Location("");
+        loc.setLatitude(latitude);
+        loc.setLongitude(longitude);
+
+        float distanceInMeters = parkingLoc.distanceTo(loc);
+        if(distanceInMeters > distance)
+        {
+            return true;
+        }
+        return false;
     }
 }
