@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le :  mar. 07 mai 2019 à 11:14
+-- Généré le :  mar. 07 mai 2019 à 15:18
 -- Version du serveur :  10.1.36-MariaDB
 -- Version de PHP :  7.2.11
 
@@ -76,6 +76,9 @@ CREATE TABLE `user_spots` (
   `name` varchar(150) NOT NULL,
   `lat` double NOT NULL,
   `lng` double NOT NULL,
+  `type` int(1) NOT NULL,
+  `free` tinyint(1) NOT NULL,
+  `availableSpots` int(1) NOT NULL,
   `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

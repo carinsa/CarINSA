@@ -11,7 +11,7 @@ if(isset($_GET['u'])){
 		$connectPdo=true;
 		include('pdo.inc.php');
 		
-		$req="SELECT spotid, name, AVG(lat) AS lat, AVG(lng) AS lng, COUNT(*) AS nb FROM user_spots GROUP BY spotid";
+		$req="SELECT spotid, name, AVG(lat) AS lat, AVG(lng) AS lng, (select type from user_spots us2 where us1.spotid = us2.spotid group by type order by count(*) desc limit 1) as type, (select free from user_spots us2 where us1.spotid = us2.spotid group by free order by count(*) desc limit 1) as free, (select availableSpots from user_spots us2 where us1.spotid = us2.spotid group by availableSpots order by count(*) desc limit 1) as availableSpots, COUNT(*) AS nb FROM user_spots us1 GROUP BY spotid;";
 		$stmt = $conn->query($req);
 		$spots=array();
 		while($select = $stmt->fetch()){
@@ -20,6 +20,9 @@ if(isset($_GET['u'])){
 			$obj['name']=$select['name'];
 			$obj['lat']=$select['lat'];
 			$obj['lng']=$select['lng'];
+			$obj['type']=$select['type'];
+			$obj['free']=boolval($select['free']);
+			$obj['availableSpots']=$select['availableSpots'];
 			$obj['nb']=$select['nb'];
 			$spots[]=$obj;
 		}
