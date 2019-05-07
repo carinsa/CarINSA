@@ -63,6 +63,41 @@
             android:text="@string/bottom_sheet_content"
             android:textColor="@android:color/white" />
 
+        <TextView
+
+            android:id="@+id/bottom_content2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/bottom_content"
+            android:layout_marginTop="5dp"
+            android:background="#00E0DADA"
+            android:gravity="center_horizontal"
+            android:text="@string/bottom_sheet_content"
+            android:textColor="@android:color/white" />
+        <TextView
+
+            android:id="@+id/bottom_content3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/bottom_content2"
+            android:layout_marginTop="5dp"
+            android:background="#00E0DADA"
+            android:gravity="center_horizontal"
+            android:text="@string/bottom_sheet_content"
+            android:textColor="@android:color/white" />
+        <TextView
+
+            android:id="@+id/bottom_content4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/bottom_content3"
+            android:layout_marginTop="5dp"
+            android:background="#00E0DADA"
+            android:gravity="center_horizontal"
+            android:text="@string/bottom_sheet_content"
+            android:textColor="@android:color/white" />
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -78,7 +113,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#00E0DADA"
-            android:text="Parking libre"
+            android:text="Parking Complet"
             android:textColor="@android:color/white" />
 
             <TextView
@@ -87,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#00E0DADA"
-                android:text="Parking plein"
+                android:text="Parking Libre"
                 android:textColor="@android:color/white" />
 
             <TextView
