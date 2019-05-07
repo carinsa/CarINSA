@@ -30,8 +30,8 @@ public class BackendAPI {
     private String uid;
     private int fetchStatus=-1;
     private Runnable callback;
-    private static final String URL_GETPARKINGS = "http://192.168.1.56/smart/getParkings.php";
-    private static final String URL_RATEPARKING = "http://192.168.1.56/smart/setRating.php";
+    private static final String URL_GETPARKINGS = "http://192.168.43.253/smart/getParkings.php";
+    private static final String URL_RATEPARKING = "http://192.168.43.253/smart/setRating.php";
 
     public BackendAPI(RequestQueue rq,String uid){
         this.rq=rq;

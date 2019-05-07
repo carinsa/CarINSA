@@ -35,6 +35,7 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.android.support:support-annotations:28.0.0'
+    implementation 'com.github.dimorinny:floating-text-button:0.0.4'
 
 
 }
