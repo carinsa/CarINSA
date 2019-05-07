@@ -154,10 +154,10 @@ public class BackendAPI {
 
     public void rateParking(Parking p, int rating){
         if(rating>=0 && rating<=3){
-            boolean request=true;
             if(rating==0){
                 if(p.getAvis().isAvisComplet()){
-                    request=false;
+                    p.getAvis().setAvisComplet(false);
+                    p.getAvis().setComplet(p.getAvis().getComplet() - 1);
                 }
                 else {
                     p.getAvis().setAvisComplet(true);
@@ -167,11 +167,11 @@ public class BackendAPI {
                         p.getAvis().setLibre(p.getAvis().getLibre() - 1);
                     }
                 }
-
             }
             else if(rating==1){
                 if(p.getAvis().isAvisLibre()){
-                    request=false;
+                    p.getAvis().setAvisLibre(false);
+                    p.getAvis().setLibre(p.getAvis().getLibre() - 1);
                 }
                 else {
                     p.getAvis().setAvisLibre(true);
@@ -184,7 +184,8 @@ public class BackendAPI {
             }
             else if(rating==2){
                 if(p.getAvis().isAvisFerme()){
-                    request=false;
+                    p.getAvis().setAvisFerme(false);
+                    p.getAvis().setFerme(p.getAvis().getFerme() - 1);
                 }
                 else {
                     p.getAvis().setAvisFerme(true);
@@ -197,7 +198,8 @@ public class BackendAPI {
             }
             else if(rating==3){
                 if(p.getAvis().isAvisOuvert()){
-                    request=false;
+                    p.getAvis().setAvisOuvert(false);
+                    p.getAvis().setOuvert(p.getAvis().getOuvert() - 1);
                 }
                 else {
                     p.getAvis().setAvisOuvert(true);
@@ -219,9 +221,7 @@ public class BackendAPI {
                     Log.e("json",error.toString());
                 }
             });
-            if(request) {
-                rq.add(jsonObjectRequest);
-            }
+            rq.add(jsonObjectRequest);
         }
     }
     public void addSpot(double lat, double lng, int type, boolean free, int available){
