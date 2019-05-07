@@ -49,7 +49,6 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.carinsa.backendapi.BackendAPI;
 import com.carinsa.model.Parking;
-import com.carinsa.model.Place;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -291,11 +290,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 for (int i = 0; i < parkings.length; i++) {
                     Log.e("p", parkings[i].toString());
                     addMarker(parkings[i]);
-                }
-                Parking[] spots = bapi.getAllSpots();
-                for(int i=0;i<spots.length;i++){
-                    Log.e("p",spots[i].toString());
-                    addMarker(spots[i]);
                 }
                 //bapi.addSpot();
             }
