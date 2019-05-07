@@ -683,6 +683,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 {
                     Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
                 }else{
+
                     if (selectedParking.getAvis().isAvisLibre()) {
                         bapi.rateParking(selectedParking, 1);
                         Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
@@ -702,6 +703,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         avis3.setEnabled(true);
                         avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
                     }
+
                 }
 
             }
@@ -770,3 +772,4 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 }
+
