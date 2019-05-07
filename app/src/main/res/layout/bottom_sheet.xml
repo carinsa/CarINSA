@@ -114,6 +114,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="3dp"
                 app:floating_background_color="#19c1e6"
+
                 app:floating_left_icon="@drawable/traffic_jam"
                 app:floating_title="Complet"
                 app:floating_title_color="@android:color/white"
@@ -127,6 +128,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="3dp"
                 app:floating_background_color="#19c1e6"
+
                 app:floating_left_icon="@drawable/parking"
                 app:floating_title="libre"
                 app:floating_title_color="@android:color/white"
@@ -138,6 +140,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:floating_background_color="#19c1e6"
+
                 app:floating_left_icon="@drawable/close"
                 app:floating_title="fermé"
                 app:floating_title_color="@android:color/white"
