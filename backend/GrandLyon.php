@@ -1,7 +1,7 @@
 <?php
 function updateGrandLyonData(){
 	$username="alexandre.van-beurden@insa-lyon.fr";
-	$password="";
+	$password="r96qFaGe+pq7jatabnz7cN";
 	$park_url='https://download.data.grandlyon.com/wfs/rdata?SERVICE=WFS&VERSION=2.0.0&outputformat=GEOJSON&maxfeatures=1000&request=GetFeature&typename=pvo_patrimoine_voirie.pvoparkingtr&SRSNAME=urn:ogc:def:crs:EPSG::4171';
 	$opts=array(
 		'http'=>array(
