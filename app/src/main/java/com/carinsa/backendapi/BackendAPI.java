@@ -30,8 +30,11 @@ public class BackendAPI {
     private String uid;
     private int fetchStatus=-1;
     private Runnable callback;
-    private static final String URL_GETPARKINGS = "http://192.168.43.253/smart/getParkings.php";
-    private static final String URL_RATEPARKING = "http://192.168.43.253/smart/setRating.php";
+
+    private static final String URL_GETPARKINGS = "http://192.168.43.192/smart/getParkings.php";
+    private static final String URL_RATEPARKING = "http://192.168.43.192/smart/setRating.php";
+    private static final String URL_GETSPOTS = "http://192.168.43.192/smart/getUserSpots.php";
+    private static final String URL_ADDSPOT = "http://192.168.43.192/smart/assUserSpots.php";
 
     public BackendAPI(RequestQueue rq,String uid){
         this.rq=rq;
@@ -40,7 +43,6 @@ public class BackendAPI {
 
     public void fetchParkings(final Runnable callback){
         this.callback=callback;
-        Log.e("callback",callback.toString());
         fetchStatus=0;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_GETPARKINGS+"?u="+uid, null, new Response.Listener<JSONObject>() {
             @Override
@@ -51,7 +53,7 @@ public class BackendAPI {
                     parkings = new Parking[values.length()];
                     for (int i = 0; i < values.length(); i++) {
                         JSONObject object = values.getJSONObject(i);
-                        int pkgid=object.getInt("pkgid");
+                        String pkgid=object.getString("pkgid");
                         String name=object.getString("name");
                         Double lat=object.getDouble("lat");
                         Double lng=object.getDouble("lng");
@@ -75,8 +77,57 @@ public class BackendAPI {
                         p.setAvis(avis);
                         parkings[i]=p;
                     }
-                    fetchStatus=1;
-                    callback.run();
+                    JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET, URL_GETSPOTS+"?u="+uid, null, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                Log.e("json",response.toString());
+                                JSONArray values=response.getJSONArray("spots");
+                                Parking[] spots = new Parking[values.length()];
+                                for (int i = 0; i < values.length(); i++) {
+                                    JSONObject object = values.getJSONObject(i);
+                                    String spotid=object.getString("spotid");
+                                    String name=object.getString("name");
+                                    Double lat=object.getDouble("lat");
+                                    Double lng=object.getDouble("lng");
+                                    int nb=object.getInt("nb");
+
+                                    Parking s = new Parking(spotid,name,lat,lng,-1);
+                                    s.setSpot(true);
+
+                                    JSONObject avisObj = object.getJSONObject("ratings");
+                                    int complet=avisObj.getInt("full");
+                                    int libre=avisObj.getInt("available");
+                                    int ferme=avisObj.getInt("close");
+                                    int ouvert=avisObj.getInt("open");
+
+                                    avisObj = object.getJSONObject("my-ratings");
+                                    boolean avisComplet=avisObj.getBoolean("full");
+                                    boolean avisLibre=avisObj.getBoolean("available");
+                                    boolean avisFerme=avisObj.getBoolean("close");
+                                    boolean avisOuvert=avisObj.getBoolean("open");
+
+                                    Avis avis=new Avis(complet,libre,ferme,ouvert,avisComplet,avisLibre,avisFerme,avisOuvert);
+                                    s.setAvis(avis);
+
+                                    spots[i]=s;
+                                }
+                                Parking[] ps=combine(parkings,spots);
+                                parkings=ps;
+
+                                fetchStatus=1;
+                                callback.run();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.e("json",error.toString());
+                        }
+                    });
+                    rq.add(jsonObjectRequest1);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -87,7 +138,16 @@ public class BackendAPI {
                 Log.e("json",error.toString());
             }
         });
+
         rq.add(jsonObjectRequest);
+
+    }
+    private static Parking[] combine(Parking[] a, Parking[] b){
+        int length = a.length + b.length;
+        Parking[] result = new Parking[length];
+        System.arraycopy(a, 0, result, 0, a.length);
+        System.arraycopy(b, 0, result, a.length, b.length);
+        return result;
     }
     public int fetchStatus() {
         return fetchStatus;
@@ -95,6 +155,62 @@ public class BackendAPI {
 
     public void rateParking(Parking p, int rating){
         if(rating>=0 && rating<=3){
+            if(rating==0){
+                if(p.getAvis().isAvisComplet()){
+                    p.getAvis().setAvisComplet(false);
+                    p.getAvis().setComplet(p.getAvis().getComplet() - 1);
+                }
+                else {
+                    p.getAvis().setAvisComplet(true);
+                    p.getAvis().setComplet(p.getAvis().getComplet() + 1);
+                    if(p.getAvis().isAvisLibre()){
+                        p.getAvis().setAvisLibre(false);
+                        p.getAvis().setLibre(p.getAvis().getLibre() - 1);
+                    }
+                }
+            }
+            else if(rating==1){
+                if(p.getAvis().isAvisLibre()){
+                    p.getAvis().setAvisLibre(false);
+                    p.getAvis().setLibre(p.getAvis().getLibre() - 1);
+                }
+                else {
+                    p.getAvis().setAvisLibre(true);
+                    p.getAvis().setLibre(p.getAvis().getLibre() + 1);
+                    if(p.getAvis().isAvisComplet()){
+                        p.getAvis().setAvisComplet(false);
+                        p.getAvis().setComplet(p.getAvis().getComplet() - 1);
+                    }
+                }
+            }
+            else if(rating==2){
+                if(p.getAvis().isAvisFerme()){
+                    p.getAvis().setAvisFerme(false);
+                    p.getAvis().setFerme(p.getAvis().getFerme() - 1);
+                }
+                else {
+                    p.getAvis().setAvisFerme(true);
+                    p.getAvis().setFerme(p.getAvis().getFerme() + 1);
+                    if(p.getAvis().isAvisOuvert()){
+                        p.getAvis().setAvisOuvert(false);
+                        p.getAvis().setOuvert(p.getAvis().getOuvert() - 1);
+                    }
+                }
+            }
+            else if(rating==3){
+                if(p.getAvis().isAvisOuvert()){
+                    p.getAvis().setAvisOuvert(false);
+                    p.getAvis().setOuvert(p.getAvis().getOuvert() - 1);
+                }
+                else {
+                    p.getAvis().setAvisOuvert(true);
+                    p.getAvis().setOuvert(p.getAvis().getOuvert() + 1);
+                    if(p.getAvis().isAvisOuvert()){
+                        p.getAvis().setAvisFerme(false);
+                        p.getAvis().setFerme(p.getAvis().getFerme() - 1);
+                    }
+                }
+            }
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_RATEPARKING+"?u="+uid+"&p="+p.getPkgid()+"&r="+rating, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
@@ -108,6 +224,20 @@ public class BackendAPI {
             });
             rq.add(jsonObjectRequest);
         }
+    }
+    public void addSpot(double lat, double lng, int type, boolean free, int available){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_ADDSPOT+"?u="+uid+"&lat="+lat+"&lng="+lng+"&free="+free+"&available="+available+"&type="+type, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.e("json",response.toString());
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("json",error.toString());
+            }
+        });
+        rq.add(jsonObjectRequest);
     }
 
     public Parking[] getAllParkings() {
