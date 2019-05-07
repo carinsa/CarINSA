@@ -46,6 +46,7 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.carinsa.backendapi.BackendAPI;
 import com.carinsa.model.Parking;
+import com.carinsa.model.Place;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -269,6 +270,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     Log.e("p",parkings[i].toString());
                     addMarker(parkings[i]);
                 }
+                Parking[] spots = bapi.getAllSpots();
+                for(int i=0;i<spots.length;i++){
+                    Log.e("p",spots[i].toString());
+                    addMarker(spots[i]);
+                }
+                //bapi.addSpot();
             }
         });
         //click effect for fab
@@ -303,7 +310,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
         parkingMarker.setPosition(parkingGeo);
         parkingMarker.setRelatedObject(p);
-        if(p.getAvailableSpots()>0) {
+
+        if(p.isSpot()) {
+            parkingMarker.setIcon(getResources().getDrawable(R.drawable.markeruser50));
+        }
+        else if(p.getAvailableSpots()>0) {
             parkingMarker.setIcon(getResources().getDrawable(R.drawable.markeravailable50));
         }
         else if(p.getAvailableSpots()==0) {
@@ -551,10 +562,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
         selected=marker;
         selected.setIcon(getResources().getDrawable(R.drawable.markerselected50));
-        Parking parking = (Parking) marker.getRelatedObject();
-        mapView.getController().animateTo(new GeoPoint(parking.getLat(), parking.getLng()));
-
         final Parking parking = (Parking) marker.getRelatedObject();
+        mapView.getController().animateTo(new GeoPoint(parking.getLat(), parking.getLng()));
         lastLong = parking.getLng();
                 lastLat = parking.getLat();
                 mapView.getController().animateTo(new GeoPoint(lastLat, lastLong));
@@ -573,7 +582,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 else {
                     viewContent.setText("No information");
                 }
-                navigate= findViewById(R.id.navigate);
+                navigate= findViewById(R.id.navigator);
                 navigate.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
                         String label = parking.getName();
