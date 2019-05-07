@@ -462,14 +462,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                     destination.setPosition(parkingGeo);
                     destination.setIcon(getResources().getDrawable(R.drawable.markerdestination50));
-                    /*destination.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    destination.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker,
                                                      MapView mapView) {
-                            mapView.getOverlayManager().remove(marker);
                             return true;
                         }
-                    });*/
+                    });
                     map.getOverlays().add(destination);
                     markers.add(destination);
 
@@ -551,10 +550,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
         selected=marker;
         selected.setIcon(getResources().getDrawable(R.drawable.markerselected50));
-        Parking parking = (Parking) marker.getRelatedObject();
+        final Parking parking = (Parking) marker.getRelatedObject();
         mapView.getController().animateTo(new GeoPoint(parking.getLat(), parking.getLng()));
 
-        final Parking parking = (Parking) marker.getRelatedObject();
         lastLong = parking.getLng();
                 lastLat = parking.getLat();
                 mapView.getController().animateTo(new GeoPoint(lastLat, lastLong));
@@ -573,7 +571,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 else {
                     viewContent.setText("No information");
                 }
-                navigate= findViewById(R.id.navigate);
+                navigate= findViewById(R.id.navigator);
                 navigate.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
                         String label = parking.getName();
