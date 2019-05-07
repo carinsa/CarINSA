@@ -11,7 +11,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.carinsa.model.Avis;
 import com.carinsa.model.Parking;
-import com.carinsa.model.Place;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.List;
 
