@@ -392,12 +392,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         handler.postDelayed(new Runnable() {
             public void run() {
                 setCenterInMyCurrentLocation();
-
             }
-        }, 2000);  // first trigger 3000ms. asynchrone!!
+        }, 1000);  // first trigger 3000ms. asynchrone!!
+        myLocationOverlay.enableMyLocation();
 
 
-//add
 
     }
 
@@ -408,6 +407,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().save(this, prefs);
         map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
+        myLocationOverlay.disableMyLocation();
     }
 
 
