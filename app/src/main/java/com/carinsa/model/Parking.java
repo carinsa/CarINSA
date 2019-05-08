@@ -14,6 +14,7 @@ public class Parking {
     private boolean free;
     private int capacity;
     private int nbContributor;
+    private boolean byUser;
 
     private Avis avis;
 
@@ -27,7 +28,7 @@ public class Parking {
         this.availableSpots=availableSpots;
     }
 
-    public Parking(String spotid,String name, double lat, double lng, int type, boolean free, int capacity, int nbContributor){
+    public Parking(String spotid,String name, double lat, double lng, int type, boolean free, int capacity, int nbContributor, boolean byUser){
         this.pkgid=spotid;
         this.name=name;
         this.lat=lat;
@@ -37,6 +38,7 @@ public class Parking {
         this.capacity=capacity;
         this.isSpot=true;
         this.nbContributor=nbContributor;
+        this.byUser=byUser;
 
     }
 
@@ -104,6 +106,10 @@ public class Parking {
         return nbContributor;
     }
 
+    public boolean isByUser() {
+        return byUser;
+    }
+
     public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
@@ -118,6 +124,10 @@ public class Parking {
 
     public void setNbContributor(int nbContributor) {
         this.nbContributor = nbContributor;
+    }
+
+    public void setByUser(boolean byUser) {
+        this.byUser = byUser;
     }
 
     public void setAvis(Avis avis) {

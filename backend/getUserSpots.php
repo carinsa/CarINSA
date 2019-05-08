@@ -11,7 +11,7 @@ if(isset($_GET['u'])){
 		$connectPdo=true;
 		include('pdo.inc.php');
 		
-		$req="SELECT spotid, name, AVG(lat) AS lat, AVG(lng) AS lng, (select type from user_spots us2 where us1.spotid = us2.spotid group by type order by count(*) desc limit 1) as type, (select free from user_spots us2 where us1.spotid = us2.spotid group by free order by count(*) desc limit 1) as free, (select availableSpots from user_spots us2 where us1.spotid = us2.spotid group by availableSpots order by count(*) desc limit 1) as availableSpots, COUNT(*) AS nb FROM user_spots us1 GROUP BY spotid;";
+		$req="SELECT spotid, name, AVG(lat) AS lat, AVG(lng) AS lng, (select type from user_spots us2 where us1.spotid = us2.spotid group by type order by count(*) desc limit 1) as type, (select free from user_spots us2 where us1.spotid = us2.spotid group by free order by count(*) desc limit 1) as free, (select availableSpots from user_spots us2 where us1.spotid = us2.spotid group by availableSpots order by count(*) desc limit 1) as availableSpots, COUNT(*) AS nb, (SELECT CASE WHEN EXISTS (SELECT * FROM user_spots us2 WHERE us2.userid='$user' AND us1.spotid = us2.spotid) THEN 1 ELSE 0 END) AS byuser FROM user_spots us1 GROUP BY spotid";
 		$stmt = $conn->query($req);
 		$spots=array();
 		while($select = $stmt->fetch()){
@@ -23,6 +23,7 @@ if(isset($_GET['u'])){
 			$obj['type']=$select['type'];
 			$obj['free']=boolval($select['free']);
 			$obj['capacity']=$select['availableSpots'];
+			$obj['byuser']=boolval($select['byuser']);
 			$obj['nb']=$select['nb'];
 			
 			$req1="SELECT state, COUNT(*) AS num FROM rating WHERE pkgid='".$obj['spotid']."' AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR) GROUP BY state";

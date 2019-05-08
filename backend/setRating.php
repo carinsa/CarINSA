@@ -32,6 +32,7 @@ if(isset($_GET['u'],$_GET['p'],$_GET['r'])){
 		$req1="SELECT state, COUNT(*) AS num FROM rating WHERE pkgid='$pkgid' AND userid='$user' AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR) GROUP BY state";
 		$stmt1 = $conn->query($req1);
 		
+		$contribution=-1;
 		$contrib=array();
 		$contrib[0]=false;
 		$contrib[1]=false;
@@ -42,15 +43,19 @@ if(isset($_GET['u'],$_GET['p'],$_GET['r'])){
 		
 			if($c==0){
 				$contrib[0]=true;
+				$contribution=0;
 			}
 			elseif($c==1){
 				$contrib[1]=true;
+				$contribution=1;
 			}
 			elseif($c==2){
 				$contrib[2]=true;
+				$contribution=2;
 			}
 			elseif($c==3){
 				$contrib[3]=true;
+				$contribution=3;
 			}
 			
 		}
@@ -61,10 +66,10 @@ if(isset($_GET['u'],$_GET['p'],$_GET['r'])){
 			$return['erreur']="Avis supprimé";
 			$return['code']="12";
 		}
-		elseif($contrib[conj($state)]){
+		elseif($contribution!=-1){
 			//update
 			$cstate=conj($state);
-			$req = "UPDATE rating SET state=$state, date=NOW() WHERE userid='$user' AND pkgid='$pkgid' AND state=$cstate AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR)";
+			$req = "UPDATE rating SET state=$state, date=NOW() WHERE userid='$user' AND pkgid='$pkgid' AND state=$contribution AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR)";
 			$stmt = $conn->query($req);
 			$return['execution']="Avis mise à jour";
 			$return['code']="12";
