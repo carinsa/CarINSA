@@ -12,8 +12,13 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.Manifest;
@@ -35,8 +40,11 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -115,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private Marker destination = null;
     private Marker selected = null;
     private FloatingActionButton popupButton;
+    private Toolbar mToolbar;
+    private Button clear;
 
 
     @Override
@@ -193,6 +203,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
         navigate = findViewById(R.id.navigator);
 
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -214,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public boolean singleTapConfirmedHelper(GeoPoint p) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 Log.e("MapView", "normal click");
+                searchBar.clearFocus();
                 return true;
             }
 
@@ -223,27 +237,70 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         }));
 
+
+
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
 
         IMapController mapController = map.getController();
         mapController.setZoom(15);
 
-        Drawable marker;
-        /* marker star for future use*/
-        marker = getResources().getDrawable(android.R.drawable.star_big_on);
-        int markerWidth = marker.getIntrinsicWidth();
-        int markerHeight = marker.getIntrinsicHeight();
-        marker.setBounds(0, markerHeight, markerWidth, 0);
 
-        myItemizedOverlay = new MyItemizedOverlay(marker);
-        map.getOverlays().add(myItemizedOverlay);
-
-        //customised geopoint
-        GeoPoint myPoint1 = new GeoPoint(0.0, 0.0);
-        myItemizedOverlay.addItem(myPoint1, "myPoint1", "myPoint1");
 
         searchBar = findViewById(R.id.search_view);
+        clear = (Button) findViewById(R.id.clear);
+        clear.setVisibility(View.INVISIBLE);
+
+        searchBar.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                //do nothing
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //do nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length() != 0) {
+                    clear.setVisibility(View.VISIBLE);
+                } else {
+                    clear.setVisibility(View.GONE);
+                }
+            }
+
+
+        });
+
+        searchBar.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                clear.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                clear.setVisibility(View.GONE);
+            }
+
+        });
+        searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+
+                if(!hasFocus){
+
+                    hideKeypad();
+                }
+            }
+        });
+
+
         Log.e("1", "test");
         searchBar.setOnClickListener(new OnClickListener() {
             @Override
@@ -270,6 +327,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
         Marker startMarker = new Marker(map);
         startMarker.setPosition(startPoint);
+
+
         //startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);// position the marker in center
         map.getOverlays().add(startMarker);
         CompassOverlay compassOverlay = new CompassOverlay(this, map);
@@ -306,6 +365,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
+
+
+    }
+
+    public void clearText(View view) {
+        searchBar.setText("");
+        clear.setVisibility(View.GONE);
     }
 
     protected void addMarker(Parking p) {
@@ -360,6 +426,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         } else {
             Toast.makeText(this, "Getting current location", LENGTH_SHORT).show();
         }
+    }
+
+    private void hideKeypad() {
+        EditText edtView = (EditText) findViewById(R.id.search_view);
+
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(edtView.getWindowToken(), 0);
     }
 
     @Override
@@ -511,6 +584,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     boutonRecherche.callOnClick();
                 }
                 return false;
+            }
+        });
+
+        searchBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
+                boutonRecherche.callOnClick();
             }
         });
         //Enfin on rajoute un petit écouteur d'évènement sur le bouton pour afficher
