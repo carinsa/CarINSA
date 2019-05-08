@@ -31,10 +31,10 @@ public class BackendAPI {
     private int fetchStatus=-1;
     private Runnable callback;
 
-    private static final String URL_GETPARKINGS = "http://192.168.43.192/smart/getParkings.php";
-    private static final String URL_RATEPARKING = "http://192.168.43.192/smart/setRating.php";
-    private static final String URL_GETSPOTS = "http://192.168.43.192/smart/getUserSpots.php";
-    private static final String URL_ADDSPOT = "http://192.168.43.192/smart/addUserSpot.php";
+    private static final String URL_GETPARKINGS = "http://192.168.1.100/DEV/parkings/getParkings.php";
+    private static final String URL_RATEPARKING = "http://192.168.1.100/DEV/parkings/setRating.php";
+    private static final String URL_GETSPOTS = "http://192.168.1.100/DEV/parkings/getUserSpots.php";
+    private static final String URL_ADDSPOT = "http://192.168.1.100/DEV/parkings/addUserSpot.php";
 
     public BackendAPI(RequestQueue rq,String uid){
         this.rq=rq;
@@ -95,8 +95,9 @@ public class BackendAPI {
                                     boolean free=object.getBoolean("free");
                                     int capacity=object.getInt("capacity");
                                     int nb=object.getInt("nb");
+                                    boolean byUser=object.getBoolean("byuser");
 
-                                    Parking s = new Parking(spotid,name,lat,lng,type,free,capacity,nb);
+                                    Parking s = new Parking(spotid,name,lat,lng,type,free,capacity,nb,byUser);
 
                                     JSONObject avisObj = object.getJSONObject("ratings");
                                     int complet=avisObj.getInt("full");
@@ -179,7 +180,7 @@ public class BackendAPI {
             else if(rating==1){
                 if(p.getAvis().isAvisLibre()){
                     p.getAvis().setAvisLibre(false);
-                    p.getAvis().setComplet(p.getAvis().getLibre() - 1);
+                    p.getAvis().setLibre(p.getAvis().getLibre() - 1);
                 }
                 else {
                     p.getAvis().setAvisLibre(true);
