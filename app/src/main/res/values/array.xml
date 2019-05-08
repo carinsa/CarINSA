@@ -5,4 +5,11 @@
         <item>@string/feedbacktype2</item>
         <item>@string/feedbacktype3</item>
     </string-array>
+
+    <string-array name="capacitylist">
+        <item>@string/capacity1</item>
+        <item>@string/capacity2</item>
+        <item>@string/capacity3</item>
+        <item>@string/capacity4</item>
+    </string-array>
 </resources>
