@@ -90,10 +90,13 @@ public class BackendAPI {
                                     String name=object.getString("name");
                                     Double lat=object.getDouble("lat");
                                     Double lng=object.getDouble("lng");
+
+                                    int type=object.getInt("type");
+                                    boolean free=object.getBoolean("free");
+                                    int capacity=object.getInt("capacity");
                                     int nb=object.getInt("nb");
 
-                                    Parking s = new Parking(spotid,name,lat,lng,-1);
-                                    s.setSpot(true);
+                                    Parking s = new Parking(spotid,name,lat,lng,type,free,capacity,nb);
 
                                     JSONObject avisObj = object.getJSONObject("ratings");
                                     int complet=avisObj.getInt("full");
