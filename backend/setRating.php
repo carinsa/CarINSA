@@ -56,7 +56,7 @@ if(isset($_GET['u'],$_GET['p'],$_GET['r'])){
 		}
 		if($contrib[$state]){
 			//nothing
-			$req = "DELETE rating WHERE state=$state AND userid='$user' AND pkgid='$pkgid' AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR) LIMIT 1";
+			$req = "DELETE FROM rating WHERE state=$state AND userid='$user' AND pkgid='$pkgid' AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR) LIMIT 1";
 			$stmt = $conn->query($req);
 			$return['erreur']="Avis supprimé";
 			$return['code']="12";
