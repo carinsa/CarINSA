@@ -31,10 +31,10 @@ public class BackendAPI {
     private int fetchStatus=-1;
     private Runnable callback;
 
-    private static final String URL_GETPARKINGS = "http://192.168.1.100/DEV/parkings/getParkings.php";
-    private static final String URL_RATEPARKING = "http://192.168.1.100/DEV/parkings/setRating.php";
-    private static final String URL_GETSPOTS = "http://192.168.1.100/DEV/parkings/getUserSpots.php";
-    private static final String URL_ADDSPOT = "http://192.168.1.100/DEV/parkings/addUserSpot.php";
+    private static final String URL_GETPARKINGS = "http://192.168.43.192/smart/getParkings.php";
+    private static final String URL_RATEPARKING = "http://192.168.43.192/smart/setRating.php";
+    private static final String URL_GETSPOTS = "http://192.168.43.192/smart/getUserSpots.php";
+    private static final String URL_ADDSPOT = "http://192.168.43.192/smart/addUserSpot.php";
 
     public BackendAPI(RequestQueue rq,String uid){
         this.rq=rq;
@@ -135,7 +135,7 @@ public class BackendAPI {
                     e.printStackTrace();
                 }
             }
-            }, new Response.ErrorListener() {
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("json",error.toString());
@@ -233,6 +233,7 @@ public class BackendAPI {
             vfree=1;
         }
 
+        //JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_ADDSPOT+"?u="+uid+"&lat="+"33.7852222"+"&lng="+"3.874241"+"&free="+vfree+"&available="+available+"&type="+type, null, new Response.Listener<JSONObject>() {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_ADDSPOT+"?u="+uid+"&lat="+lat+"&lng="+lng+"&free="+vfree+"&available="+available+"&type="+type, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -273,7 +274,7 @@ public class BackendAPI {
         double minDist = Double.MAX_VALUE;
         for (int i = 0; i < parkings.length; i++) {
             double dist = distance(lat, lng, parkings[i].getLat(), parkings[i].getLng());
-            if (parkings[i].getAvailableSpots() > 0 && dist <= radius && dist < minDist) {
+            if (dist <= radius && dist < minDist) {
                 minDist = dist;
                 minPark = parkings[i];
             }
