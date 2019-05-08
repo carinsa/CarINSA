@@ -338,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             private void callSearch(String query) {
                 Log.e("1", query);
             }
-        });*/
+        });
 
         //marker starter
         GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
@@ -918,5 +918,5 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 }
 
-}
+
 
