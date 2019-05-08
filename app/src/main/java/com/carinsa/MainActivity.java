@@ -105,6 +105,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private FloatingTextButton avis1;
     private FloatingTextButton avis2;
     private FloatingTextButton avis3;
+    private TextView viewPeek;
+    private TextView viewContent;
+    private TextView typeInfo;
+    private TextView tailleInfo;
+    private TextView prixInfo;
     private PopupWindow popupWindow;
     private Button goButton;
     private RadioGroup tailleParking;
@@ -668,8 +673,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
 
-        TextView viewPeek = llBottomSheet.findViewById(R.id.bottom_peek);
-        TextView viewContent = llBottomSheet.findViewById(R.id.bottom_content);
+        viewPeek = llBottomSheet.findViewById(R.id.bottom_peek);
+        viewContent = llBottomSheet.findViewById(R.id.bottom_content);
+
+        typeInfo = llBottomSheet.findViewById(R.id.typeInfo);
+        tailleInfo= llBottomSheet.findViewById(R.id.tailleInfo);
+        prixInfo = llBottomSheet.findViewById(R.id.prixInfo);
 
         viewPeek.setText(selectedParking.getName());
         if (selectedParking.getAvailableSpots() != -1) {
@@ -677,7 +686,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             viewContent.setText(str);
         }else{
             viewContent.setText("Pas d'information de place parking");
+        }
 
+        if(selectedParking.isSpot())
+        {
+            typeInfo.setText(selectedParking.getType());
+            tailleInfo.setText(selectedParking.getCapacity());
+            //prixInfo.setText(selectedParking.isFree());
         }
         avis1 = findViewById(R.id.complet);
         avis3 = findViewById(R.id.ferme);
