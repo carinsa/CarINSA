@@ -797,7 +797,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         navigate.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 String label = selectedParking.getName();
-                String uriBegin = "google.navigation:q=";
+                String uriBegin = "http://maps.google.com/maps?daddr=";
                 String query = lastLat + "," + lastLong + "(" + label + ")";
                 String encodedQuery = Uri.encode(query);
                 String uriString = uriBegin + encodedQuery;
