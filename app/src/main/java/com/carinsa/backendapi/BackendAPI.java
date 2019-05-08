@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,10 +32,10 @@ public class BackendAPI {
     private int fetchStatus=-1;
     private Runnable callback;
 
-    private static final String URL_GETPARKINGS = "http://192.168.43.192/smart/getParkings.php";
-    private static final String URL_RATEPARKING = "http://192.168.43.192/smart/setRating.php";
-    private static final String URL_GETSPOTS = "http://192.168.43.192/smart/getUserSpots.php";
-    private static final String URL_ADDSPOT = "http://192.168.43.192/smart/addUserSpot.php";
+    private static final String URL_GETPARKINGS = "http://192.168.1.100/DEV/parkings/getParkings.php";
+    private static final String URL_RATEPARKING = "http://192.168.1.100/DEV/parkings/setRating.php";
+    private static final String URL_GETSPOTS = "http://192.168.1.100/DEV/parkings/getUserSpots.php";
+    private static final String URL_ADDSPOT = "http://192.168.1.100/DEV/parkings/addUserSpot.php";
 
 
     public BackendAPI(RequestQueue rq,String uid){
@@ -130,6 +131,11 @@ public class BackendAPI {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             Log.e("json",error.toString());
+                            try {
+                                Log.e("json",new String(error.networkResponse.data,"UTF-8"));
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                     rq.add(jsonObjectRequest1);
@@ -141,6 +147,11 @@ public class BackendAPI {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("json",error.toString());
+                try {
+                    Log.e("json",new String(error.networkResponse.data,"UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
