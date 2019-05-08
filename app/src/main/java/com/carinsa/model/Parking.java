@@ -39,6 +39,7 @@ public class Parking {
         this.isSpot=true;
         this.nbContributor=nbContributor;
         this.byUser=byUser;
+        this.availableSpots=-1;
 
     }
 
