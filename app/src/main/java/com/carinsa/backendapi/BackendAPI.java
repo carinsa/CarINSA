@@ -36,6 +36,7 @@ public class BackendAPI {
     private static final String URL_GETSPOTS = "http://192.168.1.56/smart/getUserSpots.php";
     private static final String URL_ADDSPOT = "http://192.168.1.56/smart/assUserSpots.php";
 
+
     public BackendAPI(RequestQueue rq,String uid){
         this.rq=rq;
         this.uid=uid;
@@ -90,10 +91,14 @@ public class BackendAPI {
                                     String name=object.getString("name");
                                     Double lat=object.getDouble("lat");
                                     Double lng=object.getDouble("lng");
-                                    int nb=object.getInt("nb");
 
-                                    Parking s = new Parking(spotid,name,lat,lng,-1);
-                                    s.setSpot(true);
+                                    int type=object.getInt("type");
+                                    boolean free=object.getBoolean("free");
+                                    int capacity=object.getInt("capacity");
+                                    int nb=object.getInt("nb");
+                                    boolean byUser=object.getBoolean("byuser");
+
+                                    Parking s = new Parking(spotid,name,lat,lng,type,free,capacity,nb,byUser);
 
                                     JSONObject avisObj = object.getJSONObject("ratings");
                                     int complet=avisObj.getInt("full");
@@ -132,7 +137,7 @@ public class BackendAPI {
                     e.printStackTrace();
                 }
             }
-            }, new Response.ErrorListener() {
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("json",error.toString());
@@ -210,6 +215,7 @@ public class BackendAPI {
                 }
             }
 
+            Log.e("REQ",URL_RATEPARKING+"?u="+uid+"&p="+p.getPkgid()+"&r="+rating);
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_RATEPARKING+"?u="+uid+"&p="+p.getPkgid()+"&r="+rating, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
@@ -225,7 +231,13 @@ public class BackendAPI {
         }
     }
     public void addSpot(double lat, double lng, int type, boolean free, int available){
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_ADDSPOT+"?u="+uid+"&lat="+lat+"&lng="+lng+"&free="+free+"&available="+available+"&type="+type, null, new Response.Listener<JSONObject>() {
+        int vfree=0;
+        if(free){
+            vfree=1;
+        }
+
+        //JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_ADDSPOT+"?u="+uid+"&lat="+"33.7852222"+"&lng="+"3.874241"+"&free="+vfree+"&available="+available+"&type="+type, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_ADDSPOT+"?u="+uid+"&lat="+lat+"&lng="+lng+"&free="+vfree+"&available="+available+"&type="+type, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.e("json",response.toString());
@@ -265,7 +277,7 @@ public class BackendAPI {
         double minDist = Double.MAX_VALUE;
         for (int i = 0; i < parkings.length; i++) {
             double dist = distance(lat, lng, parkings[i].getLat(), parkings[i].getLng());
-            if (parkings[i].getAvailableSpots() > 0 && dist <= radius && dist < minDist) {
+            if (dist <= radius && dist < minDist) {
                 minDist = dist;
                 minPark = parkings[i];
             }

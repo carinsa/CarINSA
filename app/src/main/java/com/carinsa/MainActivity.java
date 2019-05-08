@@ -44,10 +44,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+
 import android.widget.EditText;
+
+import android.widget.CompoundButton;
+
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -107,14 +114,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private FloatingTextButton avis1;
     private FloatingTextButton avis2;
     private FloatingTextButton avis3;
+    private TextView viewPeek;
+    private TextView viewContent;
+    private TextView typeInfo;
+    private TextView tailleInfo;
+    private TextView prixInfo;
     private PopupWindow popupWindow;
+    private Button goButton;
+    private Spinner tailleParking;
+    private int tailleParkingSelected;
+    private RadioGroup prixParking;
+    private boolean prixParkingSelected;
+    private Spinner typeParking;
+    private int typeParkingSelected;
     private View popupView;
     private TranslateAnimation animation;
     private BottomSheetBehavior bottomSheetBehavior;
     private LinearLayout llBottomSheet;
     private double lastLat;
     private double lastLong;
-
 
     private static final int MULTIPLE_PERMISSION_REQUEST_CODE = 4;
     private final Handler handler = new Handler();
@@ -211,13 +229,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         popupButton = (FloatingActionButton) findViewById(R.id.popupButton);
-
         popupButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 popParking();
             }
         });
-
 
         fab = findViewById(R.id.fab);
         map = findViewById(R.id.map);
@@ -248,6 +264,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
         searchBar = findViewById(R.id.search_view);
+
         clear = (Button) findViewById(R.id.clear);
         clear.setVisibility(View.INVISIBLE);
 
@@ -301,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
 
 
-        Log.e("1", "test");
+
         searchBar.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -321,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             private void callSearch(String query) {
                 Log.e("1", query);
             }
-        });
+        });*/
 
         //marker starter
         GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
@@ -347,6 +364,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         requestQueue.start();
 
         bapi = new BackendAPI(requestQueue, Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
+        //bapi = new BackendAPI(requestQueue, "10");
         bapi.fetchParkings(new Runnable() {
             @Override
             public void run() {
@@ -372,6 +390,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void clearText(View view) {
         searchBar.setText("");
         clear.setVisibility(View.GONE);
+
     }
 
     protected void addMarker(Parking p) {
@@ -399,7 +418,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         parkingMarker.setPosition(parkingGeo);
         parkingMarker.setRelatedObject(p);
 
-        if (p.getAvailableSpots() > 0) {
+        if (p.isSpot()) {
+            parkingMarker.setIcon(getResources().getDrawable(R.drawable.markeruser50));
+        }
+        else if (p.getAvailableSpots() > 0) {
             parkingMarker.setIcon(getResources().getDrawable(R.drawable.markeravailable50));
         } else if (p.getAvailableSpots() == 0) {
             parkingMarker.setIcon(getResources().getDrawable(R.drawable.markerfull50));
@@ -644,13 +666,78 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 0, 500);
         popupView.startAnimation(animation);
 
+        tailleParking = popupView.findViewById(R.id.SpinnerCapacity);
+        prixParking = popupView.findViewById(R.id.radioPrice);
+        typeParking = popupView.findViewById(R.id.SpinnerFeedbackType);
+        goButton = popupView.findViewById(R.id.ButtonSendFeedback);
 
+        tailleParkingSelected = 0;
+        tailleParking.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                tailleParkingSelected = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                tailleParkingSelected = 0;
+            }
+        });
+
+        prixParkingSelected = true;
+        prixParking.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(checkedId == R.id.radioP){
+                    prixParkingSelected = true;
+                }else if(checkedId == R.id.radioG){
+                    prixParkingSelected = false;
+                }
+            }
+        });
+
+        typeParkingSelected = 0;
+        typeParking.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                typeParkingSelected = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                typeParkingSelected = 0;
+            }
+        });
+
+        goButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                Log.e("lat",Double.toString(mLastLocation.getLatitude()));
+                Log.e("long",Double.toString(mLastLocation.getLongitude()));
+                Log.e("type Parking", Integer.toString(typeParkingSelected));
+                Log.e("prix Parking", Boolean.toString(prixParkingSelected));
+                Log.e("taille Parking", Integer.toString(tailleParkingSelected));
+                Parking p = bapi.getClosestAvailableParking(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1000);
+
+                if(p==null){
+                    bapi.addSpot(mLastLocation.getLatitude(), mLastLocation.getLongitude(), typeParkingSelected, prixParkingSelected, tailleParkingSelected);
+                    Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
+                }else{
+                    Log.e("parking proche", p.getName());
+                    Snackbar.make(llBottomSheet, "Un parking proche existe déjà.", Snackbar.LENGTH_SHORT).show();
+                }
+
+                popupWindow.dismiss();
+            }
+        });
     }
 
     public void selectMarker(Marker marker, MapView mapView) {
         if (selected != null) {
             Parking p = (Parking) selected.getRelatedObject();
-            if (p.getAvailableSpots() > 0) {
+            if (p.isSpot()) {
+                selected.setIcon(getResources().getDrawable(R.drawable.markeruser50));
+            }
+            else if (p.getAvailableSpots() > 0) {
                 selected.setIcon(getResources().getDrawable(R.drawable.markeravailable50));
             } else if (p.getAvailableSpots() == 0) {
                 selected.setIcon(getResources().getDrawable(R.drawable.markerfull50));
@@ -671,37 +758,37 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
 
-        TextView viewPeek = llBottomSheet.findViewById(R.id.bottom_peek);
-        TextView viewContent = llBottomSheet.findViewById(R.id.bottom_content);
-        TextView viewContent2 = llBottomSheet.findViewById(R.id.bottom_content2);
-        TextView viewContent3 = llBottomSheet.findViewById(R.id.bottom_content3);
-        TextView viewContent4 = llBottomSheet.findViewById(R.id.bottom_content4);
+        viewPeek = llBottomSheet.findViewById(R.id.bottom_peek);
+        viewContent = llBottomSheet.findViewById(R.id.bottom_content);
+
+        typeInfo = llBottomSheet.findViewById(R.id.typeInfo);
+        tailleInfo= llBottomSheet.findViewById(R.id.tailleInfo);
+        prixInfo = llBottomSheet.findViewById(R.id.prixInfo);
 
         viewPeek.setText(selectedParking.getName());
         if (selectedParking.getAvailableSpots() != -1) {
             String str = selectedParking.getAvailableSpots() + " " + "places libres";
             viewContent.setText(str);
         }else{
-            viewContent.setText("Pas d'information de place parking");
 
+            viewContent.setText("Pas d'information sur les places disponibles");
         }
-        int complet = selectedParking.getAvis().getComplet();
-        int libre = selectedParking.getAvis().getLibre();
-        int ferme = selectedParking.getAvis().getFerme();
 
-        viewContent2.setText(complet + " Personnes ont déclaré que ce parking est complet.");
-        viewContent3.setText(libre + " Personnes ont déclaré que ce parking est libre.");
-        viewContent4.setText(ferme + " Personnes ont déclaré que ce parking est ferme.");
-
+        if(selectedParking.isSpot())
+        {
+            typeInfo.setText(selectedParking.getType());
+            tailleInfo.setText(selectedParking.getCapacity());
+            prixInfo.setText(selectedParking.isFree());
+        }else{
+            typeInfo.setText("");
+            tailleInfo.setText("");
+            prixInfo.setText("");
+        }
         avis1 = findViewById(R.id.complet);
-
         avis3 = findViewById(R.id.ferme);
-
-
         avis2 = findViewById(R.id.libre);
 
-
-
+        setTextAvis();
         setupNavigation();
         reinitializeButtons();
         setupAvisBouttons();
@@ -729,23 +816,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private void setupAvisBouttons() {
         avis1.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
+                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 10000))
                 {
                     Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
 
                 }else{
+                    bapi.rateParking(selectedParking, 0);
+                    avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
+                    avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
+                    Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
+                    setTextAvis();
                     if(selectedParking.getAvis().isAvisComplet()){
-                        bapi.rateParking(selectedParking, 0);
-                        Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
-                        avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
-                    }else{
-                        bapi.rateParking(selectedParking, 0);
-                        Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
+
                         avis1.setBackgroundColor(Color.parseColor("#808080"));
-                        avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
+                    }else{
+                        avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
+
                     }
                 }
 
@@ -754,47 +840,42 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
         avis2.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
+                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 10000))
                 {
                     Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
                 }else{
 
+                    bapi.rateParking(selectedParking, 1);
+                    avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
+                    avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
+                    Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
+                    setTextAvis();
                     if (selectedParking.getAvis().isAvisLibre()) {
-                        bapi.rateParking(selectedParking, 1);
-                        Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
-                        avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
-                    } else {
-                        bapi.rateParking(selectedParking, 1);
-                        Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
                         avis2.setBackgroundColor(Color.parseColor("#808080"));
-                        avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
-                    }
+                    } else {
+                        avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
 
+                    }
                 }
 
             }
         });
         avis3.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100))
+                if(selectedParking.isFarFrom(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 10000))
                 {
                     Snackbar.make(llBottomSheet, "Vous êtes trop loin du parking séléctionné", Snackbar.LENGTH_SHORT).show();
                 }else {
+                    bapi.rateParking(selectedParking, 2);
+                    avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
+                    avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
+                    Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
+                    setTextAvis();
                     if (selectedParking.getAvis().isAvisFerme()) {
-                        bapi.rateParking(selectedParking, 2);
-                        Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
-                        avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
-                    } else {
-                        bapi.rateParking(selectedParking, 2);
-                        Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
+
                         avis3.setBackgroundColor(Color.parseColor("#808080"));
-                        avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
-                        avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
+                    } else {
+                        avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
                     }
                 }
 
@@ -804,15 +885,38 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
     private void reinitializeButtons(){
-        if(lastSelectedParking!=selectedParking) {
-            selectedParking.getAvis().setAvisComplet(false);
+
+            boolean complet = selectedParking.getAvis().isAvisComplet();
+            boolean libre = selectedParking.getAvis().isAvisLibre();
+            boolean ferme = selectedParking.getAvis().isAvisFerme();
             avis1.setBackgroundColor(Color.parseColor("#19c1e6"));
-            selectedParking.getAvis().setAvisLibre(false);
             avis2.setBackgroundColor(Color.parseColor("#19c1e6"));
-            selectedParking.getAvis().setAvisFerme(false);
             avis3.setBackgroundColor(Color.parseColor("#19c1e6"));
-        }
+            if(complet) {
+                avis1.setBackgroundColor(Color.parseColor("#808080"));
+            }
+            if(libre){
+                avis2.setBackgroundColor(Color.parseColor("#808080"));
+            }
+            if(ferme){
+                avis3.setBackgroundColor(Color.parseColor("#808080"));
+            }
     }
+
+    private void setTextAvis(){
+
+        TextView viewContent2 = llBottomSheet.findViewById(R.id.bottom_content2);
+        TextView viewContent3 = llBottomSheet.findViewById(R.id.bottom_content3);
+        TextView viewContent4 = llBottomSheet.findViewById(R.id.bottom_content4);
+        int complet = selectedParking.getAvis().getComplet();
+        int libre = selectedParking.getAvis().getLibre();
+        int ferme = selectedParking.getAvis().getFerme();
+
+        viewContent2.setText(complet + " Personnes ont déclaré que ce parking est complet.");
+        viewContent3.setText(libre + " Personnes ont déclaré que ce parking est libre.");
+        viewContent4.setText(ferme + " Personnes ont déclaré que ce parking est ferme.");
+    }
+}
 
 }
 

@@ -24,14 +24,15 @@ if(isset($_GET['u'],$_GET['p'],$_GET['r'])){
 	$pkgid=$_GET['p'];
 	$state=$_GET['r'];
 	
-	if(preg_match("/^[a-zA-Z0-9]+$/",$user) and preg_match("/^[0-9]+$/",$pkgid) and preg_match("/^[0-3]$/",$state)){
+	if(preg_match("/^[a-zA-Z0-9]+$/",$user) and preg_match("/^[0-9A-Za-z]+$/",$pkgid) and preg_match("/^[0-3]$/",$state)){
 		$connectPdo=true;
 		include('pdo.inc.php');
 		
 		
-		$req1="SELECT state, COUNT(*) AS num FROM rating WHERE pkgid=$pkgid AND userid='$user' AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR) GROUP BY state";
+		$req1="SELECT state, COUNT(*) AS num FROM rating WHERE pkgid='$pkgid' AND userid='$user' AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR) GROUP BY state";
 		$stmt1 = $conn->query($req1);
 		
+		$contribution=-1;
 		$contrib=array();
 		$contrib[0]=false;
 		$contrib[1]=false;
@@ -42,36 +43,40 @@ if(isset($_GET['u'],$_GET['p'],$_GET['r'])){
 		
 			if($c==0){
 				$contrib[0]=true;
+				$contribution=0;
 			}
 			elseif($c==1){
 				$contrib[1]=true;
+				$contribution=1;
 			}
 			elseif($c==2){
 				$contrib[2]=true;
+				$contribution=2;
 			}
 			elseif($c==3){
 				$contrib[3]=true;
+				$contribution=3;
 			}
 			
 		}
 		if($contrib[$state]){
 			//nothing
-			$req = "DELETE rating WHERE state=$state AND userid='$user' AND pkgid='$pkgid' AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR) LIMIT 1";
+			$req = "DELETE FROM rating WHERE state=$state AND userid='$user' AND pkgid='$pkgid' AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR) LIMIT 1";
 			$stmt = $conn->query($req);
 			$return['erreur']="Avis supprimé";
 			$return['code']="12";
 		}
-		elseif($contrib[conj($state)]){
+		elseif($contribution!=-1){
 			//update
 			$cstate=conj($state);
-			$req = "UPDATE rating SET state=$state, date=NOW() WHERE userid='$user' AND pkgid='$pkgid' AND state=$cstate AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR)";
+			$req = "UPDATE rating SET state=$state, date=NOW() WHERE userid='$user' AND pkgid='$pkgid' AND state=$contribution AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR)";
 			$stmt = $conn->query($req);
 			$return['execution']="Avis mise à jour";
 			$return['code']="12";
 		}
 		else {
 			//insert
-			$req="INSERT INTO rating(pkgid,userid,state) VALUES ($pkgid,'$user',$state)";
+			$req="INSERT INTO rating(pkgid,userid,state) VALUES ('$pkgid','$user',$state)";
 			$stmt = $conn->query($req);
 			$return['execution']="Avis enregistré";
 			$return['code']="11";

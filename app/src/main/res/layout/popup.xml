@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ScrollView01"
     android:layout_width="300dp"
-    android:layout_height="380dp"
+    android:layout_height="310dp"
 
     android:layout_gravity="center"
     android:layout_marginLeft="10dp"
@@ -23,76 +23,45 @@
             android:layout_marginBottom="20dp"
             android:layout_gravity="center"
             android:text="@string/feedbacktitle"
-            android:textSize="10pt"></TextView>
+            android:textSize="8pt"></TextView>
 
         <TextView
-            android:layout_width="100dp"
+            android:layout_width="119dp"
             android:layout_height="25dp"
             android:layout_gravity="center"
-            android:text="Parking type:"
-            />
+            android:text="Type du parking:" />
 
 
         <Spinner
             android:id="@+id/SpinnerFeedbackType"
-            android:layout_width="150dp"
+            android:layout_width="202dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
             android:layout_gravity="center"
+            android:layout_marginBottom="20dp"
             android:entries="@array/feedbacktypelist"
             android:prompt="@string/feedbacktype"></Spinner>
 
         <TextView
-            android:layout_width="100dp"
-            android:layout_gravity="center"
-            android:layout_height="25dp"
-            android:text="Parking size:"
-            />
-
-        <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="176dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="horizontal"
             android:layout_gravity="center"
-            android:gravity="center"
-            >
-
-            <RadioGroup
-                android:id="@+id/radioSize"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
-
-                <RadioButton
-                    android:id="@+id/radioSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"
-                    android:layout_weight="1"
-                    android:checked="true"
-                    android:text="@string/small" />
-
-                <RadioButton
-                    android:id="@+id/radioLarge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+            android:text="Estimation de la capacité:" />
 
 
-                    android:text="@string/large" />
-
-            </RadioGroup>
-
-
-        </LinearLayout>
+        <Spinner
+            android:id="@+id/SpinnerCapacity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="20dp"
+            android:entries="@array/capacitylist"
+            android:prompt="@string/capacity"></Spinner>
 
         <TextView
             android:layout_width="100dp"
             android:layout_gravity="center"
             android:layout_height="25dp"
-            android:text="Parking price:"
+            android:text="Tarification:"
             />
 
 
