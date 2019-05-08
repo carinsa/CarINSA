@@ -105,9 +105,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private FloatingTextButton avis1;
     private FloatingTextButton avis2;
     private FloatingTextButton avis3;
+    private TextView viewPeek;
+    private TextView viewContent;
+    private TextView typeInfo;
+    private TextView tailleInfo;
+    private TextView prixInfo;
     private PopupWindow popupWindow;
     private Button goButton;
-    private RadioGroup tailleParking;
+    private Spinner tailleParking;
     private int tailleParkingSelected;
     private RadioGroup prixParking;
     private boolean prixParkingSelected;
@@ -577,31 +582,32 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 0, 500);
         popupView.startAnimation(animation);
 
-        tailleParking = popupView.findViewById(R.id.radioSize);
+        tailleParking = popupView.findViewById(R.id.SpinnerCapacity);
         prixParking = popupView.findViewById(R.id.radioPrice);
         typeParking = popupView.findViewById(R.id.SpinnerFeedbackType);
         goButton = popupView.findViewById(R.id.ButtonSendFeedback);
 
         tailleParkingSelected = 0;
-        tailleParking.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        tailleParking.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(checkedId == R.id.radioSmall){
-                    tailleParkingSelected = 0;
-                }else if (checkedId == R.id.radioLarge){
-                    tailleParkingSelected = 1;
-                }
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                tailleParkingSelected = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                tailleParkingSelected = 0;
             }
         });
 
-        prixParkingSelected = false;
+        prixParkingSelected = true;
         prixParking.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 if(checkedId == R.id.radioP){
-                    prixParkingSelected = false;
-                }else if(checkedId == R.id.radioG){
                     prixParkingSelected = true;
+                }else if(checkedId == R.id.radioG){
+                    prixParkingSelected = false;
                 }
             }
         });
@@ -668,16 +674,30 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
 
-        TextView viewPeek = llBottomSheet.findViewById(R.id.bottom_peek);
-        TextView viewContent = llBottomSheet.findViewById(R.id.bottom_content);
+        viewPeek = llBottomSheet.findViewById(R.id.bottom_peek);
+        viewContent = llBottomSheet.findViewById(R.id.bottom_content);
+
+        typeInfo = llBottomSheet.findViewById(R.id.typeInfo);
+        tailleInfo= llBottomSheet.findViewById(R.id.tailleInfo);
+        prixInfo = llBottomSheet.findViewById(R.id.prixInfo);
 
         viewPeek.setText(selectedParking.getName());
         if (selectedParking.getAvailableSpots() != -1) {
             String str = selectedParking.getAvailableSpots() + " " + "places libres";
             viewContent.setText(str);
         }else{
-            viewContent.setText("Pas d'information de place parking");
+            viewContent.setText("Pas d'information sur les places disponibles");
+        }
 
+        if(selectedParking.isSpot())
+        {
+            typeInfo.setText(selectedParking.getType());
+            tailleInfo.setText(selectedParking.getCapacity());
+            prixInfo.setText(selectedParking.isFree());
+        }else{
+            typeInfo.setText("");
+            tailleInfo.setText("");
+            prixInfo.setText("");
         }
         avis1 = findViewById(R.id.complet);
         avis3 = findViewById(R.id.ferme);

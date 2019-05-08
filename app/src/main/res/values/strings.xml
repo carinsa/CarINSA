@@ -18,18 +18,19 @@
 
     </string-array>
 
-    <string name="feedbacktype1">public</string>
-    <string name="feedbacktype2">privé</string>
-    <string name="feedbacktype3">stationnement trottoire</string>
-    <string name="feedbacktitle">         Plus Information</string>
-    <string name="feedbacktype">typelist</string>
-    <string name="feedbackbutton">Allez!</string>
+    <string name="feedbacktype1">Parking Public</string>
+    <string name="feedbacktype2">Parking Privé</string>
+    <string name="feedbacktype3">Stationnement Trottoire</string>
+    <string name="feedbacktitle">Informations sur le parking</string>
+    <string name="feedbacktype">Type du Parking</string>
+    <string name="feedbackbutton">Valider</string>
 
-    <string name="feedbackresponse">1-50</string>
-    <string name="feedbackresponse1">1-50</string>
-    <string name="feedbackresponse2">50-100</string>
-    <string name="small">1-50</string>
-    <string name="large">50-100</string>
-    <string name="Payant">payant</string>
-    <string name="Gratuit">gratuit</string>
+    <string name="capacity">Capacité</string>
+    <string name="capacity1">1-20 (Petit)</string>
+    <string name="capacity2">21-80 (Moyen)</string>
+    <string name="capacity3">80+ (Grand)</string>
+    <string name="capacity4">300+ (Très Grand)</string>
+
+    <string name="Payant">Gratuit</string>
+    <string name="Gratuit">Payant</string>
 </resources>

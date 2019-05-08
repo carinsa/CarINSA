@@ -66,16 +66,38 @@ public class Parking {
         return availableSpots;
     }
 
-    public boolean isFree() {
-        return free;
+    public String isFree() {
+        if(free){
+            return "Gratuit";
+        }else {
+            return "Payant";
+        }
     }
 
-    public int getCapacity() {
-        return capacity;
+    public String getCapacity() {
+        if(capacity == 0){
+            return "1-20 Places";
+        }else if(capacity == 1){
+            return "21-80 Places";
+        }else if(capacity == 2){
+            return "80+ Places";
+        }else if(capacity == 3){
+            return "300+ Places";
+        }else{
+            return "";
+        }
     }
 
-    public int getType() {
-        return type;
+    public String getType() {
+        if(type == 0){
+            return "Parking Public";
+        }else if(type == 1){
+            return "Parking Privé";
+        }else if(type == 2){
+            return "Stationnement";
+        }else{
+            return "";
+        }
     }
 
     public int getNbContributor() {
