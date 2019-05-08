@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private void setupMap() {
 
 
-        setContentView(R.layout.activity_main);
+        this.setContentView(R.layout.activity_main);
 
         llBottomSheet = (LinearLayout) findViewById(R.id.bottom_fragment);
         bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
