@@ -298,6 +298,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         requestQueue.start();
 
         bapi = new BackendAPI(requestQueue, Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
+        //bapi = new BackendAPI(requestQueue, "10");
         bapi.fetchParkings(new Runnable() {
             @Override
             public void run() {
@@ -625,11 +626,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Log.e("type Parking", Integer.toString(typeParkingSelected));
                 Log.e("prix Parking", Boolean.toString(prixParkingSelected));
                 Log.e("taille Parking", Integer.toString(tailleParkingSelected));
-                bapi.addSpot(mLastLocation.getLatitude(), mLastLocation.getLongitude(), typeParkingSelected, prixParkingSelected, tailleParkingSelected);
-                //TODO Fermer la popup ici et la reinitialiser
-                popupWindow.dismiss();
-                Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
+                Parking p = bapi.getClosestAvailableParking(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1000);
 
+                if(p==null){
+                    bapi.addSpot(mLastLocation.getLatitude(), mLastLocation.getLongitude(), typeParkingSelected, prixParkingSelected, tailleParkingSelected);
+                    Snackbar.make(llBottomSheet, "Votre contribution a été prise en compte, Merci !", Snackbar.LENGTH_SHORT).show();
+                }else{
+                    Log.e("parking proche", p.getName());
+                    Snackbar.make(llBottomSheet, "Un parking proche existe déjà.", Snackbar.LENGTH_SHORT).show();
+                }
+
+                popupWindow.dismiss();
             }
         });
     }
