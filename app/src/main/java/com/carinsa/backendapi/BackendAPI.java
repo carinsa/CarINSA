@@ -31,10 +31,11 @@ public class BackendAPI {
     private int fetchStatus=-1;
     private Runnable callback;
 
-    private static final String URL_GETPARKINGS = "http://192.168.1.100/DEV/parkings/getParkings.php";
-    private static final String URL_RATEPARKING = "http://192.168.1.100/DEV/parkings/setRating.php";
-    private static final String URL_GETSPOTS = "http://192.168.1.100/DEV/parkings/getUserSpots.php";
-    private static final String URL_ADDSPOT = "http://192.168.1.100/DEV/parkings/addUserSpot.php";
+    private static final String URL_GETPARKINGS = "http://192.168.1.56/smart/getParkings.php";
+    private static final String URL_RATEPARKING = "http://192.168.1.56/smart/setRating.php";
+    private static final String URL_GETSPOTS = "http://192.168.1.56/smart/getUserSpots.php";
+    private static final String URL_ADDSPOT = "http://192.168.1.56/smart/assUserSpots.php";
+
 
     public BackendAPI(RequestQueue rq,String uid){
         this.rq=rq;
@@ -180,7 +181,7 @@ public class BackendAPI {
             else if(rating==1){
                 if(p.getAvis().isAvisLibre()){
                     p.getAvis().setAvisLibre(false);
-                    p.getAvis().setLibre(p.getAvis().getLibre() - 1);
+                    p.getAvis().setComplet(p.getAvis().getLibre() - 1);
                 }
                 else {
                     p.getAvis().setAvisLibre(true);
@@ -213,6 +214,7 @@ public class BackendAPI {
                     }
                 }
             }
+
             Log.e("REQ",URL_RATEPARKING+"?u="+uid+"&p="+p.getPkgid()+"&r="+rating);
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_RATEPARKING+"?u="+uid+"&p="+p.getPkgid()+"&r="+rating, null, new Response.Listener<JSONObject>() {
                 @Override

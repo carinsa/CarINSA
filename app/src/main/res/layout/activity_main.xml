@@ -6,12 +6,26 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context=".MainActivity">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/linearLayout"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="fill_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            app:layout_constraintTop_toTopOf="parent"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark" />
+
 
 
         <AutoCompleteTextView
@@ -26,18 +40,33 @@
             app:layout_constraintEnd_toStartOf="@+id/ButtonEnvoyer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:hint="Cherchez une adresse"
             android:inputType="text"
             android:completionThreshold="1"/>
 
+        <Button
+            android:id="@+id/clear"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
+            android:layout_gravity="right|bottom"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="70dp"
+            android:layout_marginRight="70dp"
+            android:background="@drawable/mr_dialog_close_light"
+            android:onClick="clearText"
+            app:layout_constraintEnd_toEndOf="@+id/toolbar"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
         <ImageButton
             android:id="@+id/ButtonEnvoyer"
-            android:layout_width="54dp"
-            android:layout_height="46dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:src="@drawable/places_ic_search"
-            android:text="Recherche"
+            android:background="@null"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/search_view"
             app:layout_constraintTop_toTopOf="parent" />
@@ -48,6 +77,8 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             app:layout_constraintTop_toBottomOf="@+id/ButtonEnvoyer"
             app:layout_constraintVertical_bias="1.0" />
 
@@ -89,7 +120,7 @@
         android:id="@+id/popupButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="280dp"
+        android:layout_marginRight="285dp"
         android:layout_marginBottom="50dp"
         android:paddingBottom="20dp"
         android:src="@drawable/plus"
