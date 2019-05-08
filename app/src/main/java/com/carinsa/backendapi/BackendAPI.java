@@ -31,10 +31,10 @@ public class BackendAPI {
     private int fetchStatus=-1;
     private Runnable callback;
 
-    private static final String URL_GETPARKINGS = "http://192.168.1.56/smart/getParkings.php";
-    private static final String URL_RATEPARKING = "http://192.168.1.56/smart/setRating.php";
-    private static final String URL_GETSPOTS = "http://192.168.1.56/smart/getUserSpots.php";
-    private static final String URL_ADDSPOT = "http://192.168.1.56/smart/assUserSpots.php";
+    private static final String URL_GETPARKINGS = "http://192.168.1.100/DEV/parkings/getParkings.php";
+    private static final String URL_RATEPARKING = "http://192.168.1.100/DEV/parkings/setRating.php";
+    private static final String URL_GETSPOTS = "http://192.168.1.100/DEV/parkings/getUserSpots.php";
+    private static final String URL_ADDSPOT = "http://192.168.1.100/DEV/parkings/addUserSpot.php";
 
     public BackendAPI(RequestQueue rq,String uid){
         this.rq=rq;
@@ -209,7 +209,7 @@ public class BackendAPI {
                     }
                 }
             }
-
+            Log.e("REQ",URL_RATEPARKING+"?u="+uid+"&p="+p.getPkgid()+"&r="+rating);
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_RATEPARKING+"?u="+uid+"&p="+p.getPkgid()+"&r="+rating, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
@@ -225,7 +225,12 @@ public class BackendAPI {
         }
     }
     public void addSpot(double lat, double lng, int type, boolean free, int available){
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_ADDSPOT+"?u="+uid+"&lat="+lat+"&lng="+lng+"&free="+free+"&available="+available+"&type="+type, null, new Response.Listener<JSONObject>() {
+        int vfree=0;
+        if(free){
+            vfree=1;
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL_ADDSPOT+"?u="+uid+"&lat="+lat+"&lng="+lng+"&free="+vfree+"&available="+available+"&type="+type, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.e("json",response.toString());

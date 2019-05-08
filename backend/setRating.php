@@ -24,12 +24,12 @@ if(isset($_GET['u'],$_GET['p'],$_GET['r'])){
 	$pkgid=$_GET['p'];
 	$state=$_GET['r'];
 	
-	if(preg_match("/^[a-zA-Z0-9]+$/",$user) and preg_match("/^[0-9]+$/",$pkgid) and preg_match("/^[0-3]$/",$state)){
+	if(preg_match("/^[a-zA-Z0-9]+$/",$user) and preg_match("/^[0-9A-Za-z]+$/",$pkgid) and preg_match("/^[0-3]$/",$state)){
 		$connectPdo=true;
 		include('pdo.inc.php');
 		
 		
-		$req1="SELECT state, COUNT(*) AS num FROM rating WHERE pkgid=$pkgid AND userid='$user' AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR) GROUP BY state";
+		$req1="SELECT state, COUNT(*) AS num FROM rating WHERE pkgid='$pkgid' AND userid='$user' AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR) GROUP BY state";
 		$stmt1 = $conn->query($req1);
 		
 		$contrib=array();
@@ -71,7 +71,7 @@ if(isset($_GET['u'],$_GET['p'],$_GET['r'])){
 		}
 		else {
 			//insert
-			$req="INSERT INTO rating(pkgid,userid,state) VALUES ($pkgid,'$user',$state)";
+			$req="INSERT INTO rating(pkgid,userid,state) VALUES ('$pkgid','$user',$state)";
 			$stmt = $conn->query($req);
 			$return['execution']="Avis enregistré";
 			$return['code']="11";
