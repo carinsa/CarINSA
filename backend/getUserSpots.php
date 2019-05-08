@@ -22,7 +22,7 @@ if(isset($_GET['u'])){
 			$obj['lng']=$select['lng'];
 			$obj['type']=$select['type'];
 			$obj['free']=boolval($select['free']);
-			$obj['availableSpots']=$select['availableSpots'];
+			$obj['capacity']=$select['availableSpots'];
 			$obj['nb']=$select['nb'];
 			
 			$req1="SELECT state, COUNT(*) AS num FROM rating WHERE pkgid='".$obj['spotid']."' AND date>DATE_SUB(CURDATE(), INTERVAL 12 HOUR) GROUP BY state";
