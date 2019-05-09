@@ -28,6 +28,7 @@ La base de données est mise en place.
 2-  Dans le fichier "GrandLyon.php", modifier la valeur de la variable "password" en la remplacant avec le mot de passe de l'api Grand Lyon que nous vous avons communiquer.
 
 --Attention : en cas d'utilisation d'un téléphone portable pour tester, il faut exposer le port 80 pour permettre la connexion entre le telephone et l'ordinateur. Les deux appareils doivent bien sur être dans le même réseau.
+Pour exposer le port 80 : sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
 
 ### 4ème étape: Installer l'application et la tester
 
