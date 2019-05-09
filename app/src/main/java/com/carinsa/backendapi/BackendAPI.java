@@ -31,10 +31,11 @@ public class BackendAPI {
     private int fetchStatus=-1;
     private Runnable callback;
 
-    private static final String URL_GETPARKINGS = "http://192.168.43.192/DEV/parkings/getParkings.php";
-    private static final String URL_RATEPARKING = "http://192.168.43.192/DEV/parkings/setRating.php";
-    private static final String URL_GETSPOTS = "http://192.168.43.192/DEV/parkings/getUserSpots.php";
-    private static final String URL_ADDSPOT = "http://192.168.43.192/DEV/parkings/addUserSpot.php";
+    private static final String IP = "VOTRE_ADRESSE_IP";
+    private static final String URL_GETPARKINGS = "http://"+ IP +"/smart/getParkings.php";
+    private static final String URL_RATEPARKING = "http://"+ IP +"/smart/setRating.php";
+    private static final String URL_GETSPOTS = "http://"+ IP +"/smart/getUserSpots.php";
+    private static final String URL_ADDSPOT = "http://"+ IP +"/smart/addUserSpot.php";
 
 
     public BackendAPI(RequestQueue rq,String uid){
