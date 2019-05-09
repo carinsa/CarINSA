@@ -10,7 +10,7 @@
 
 ### 2ème étape: Mise en place du serveur :
 
-1-  Installer le logiciel WAMP.
+1-  Installer le logiciel XAMPP.
 
 2-  Copier tous les fichiers du dossier backend dans le répertoire suivant : ~/opt/lampp/htdocs/smart/ (dossier smart à créer).
 
