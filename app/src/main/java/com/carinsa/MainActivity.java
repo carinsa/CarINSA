@@ -1,5 +1,6 @@
 package com.carinsa;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
@@ -539,7 +540,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     }
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-                    Parking p = bapi.getClosestAvailableParking(coords[0], coords[1], 100);
+                    Parking p = bapi.getClosestAvailableParking(coords[0], coords[1], 1000);
                     IMapController mapController = map.getController();
                     if(p == null)
                     {
@@ -584,7 +585,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     map.getOverlays().add(destination);
                     markers.add(destination);
                 } else {
-                    //TODO
+                    Toast.makeText(MainActivity.this, "Adresse introuvable, veuillez réessayer avec une adresse valide.", LENGTH_SHORT).show();
                 }
             }
         });
@@ -597,6 +598,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         searchBar.setAdapter(adapter);
         //Event sur le bouton ok de la searchbar
         searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     boutonRecherche.callOnClick();
@@ -625,7 +627,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         try {
             address = coder.getFromLocationName(strAddress, 5);
-            if (address == null) {
+            if (address.size() == 0) {
                 return null;
             }
             Address location = address.get(0);
@@ -712,7 +714,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Log.e("type Parking", Integer.toString(typeParkingSelected));
                 Log.e("prix Parking", Boolean.toString(prixParkingSelected));
                 Log.e("taille Parking", Integer.toString(tailleParkingSelected));
-                Parking p = bapi.getClosestAvailableParking(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100);
+                Parking p = bapi.getClosestAvailableParking(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 10);
 
                 if(p==null){
                     bapi.addSpot(mLastLocation.getLatitude(), mLastLocation.getLongitude(), typeParkingSelected, prixParkingSelected, tailleParkingSelected);
