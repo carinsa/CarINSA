@@ -4,20 +4,21 @@
 
 ### 1ère étape: Cloner le projet et l'ouvrir avec android studio :
 
-1-  Installer Android Studio
-2-  New project from Version Control -> Git -> saisir le lien git du projet
+1-  Installer Android Studio.
+
+2-  New project from Version Control -> Git -> saisir le lien git du projet.
 
 ### 2ème étape: Mise en place du serveur :
 
-1-  Installer le logiciel WAMP
+1-  Installer le logiciel WAMP.
 
-2-  Copier tous les fichiers du dossier backend dans le répertoire suivant : ~/opt/lampp/htdocs/smart/ (dossier smart à créer)
+2-  Copier tous les fichiers du dossier backend dans le répertoire suivant : ~/opt/lampp/htdocs/smart/ (dossier smart à créer).
 
 3-  Aller sur l'interface phpMyAdmin via le lien suivant : http://localhost/phpmyadmin
 
-4-  Créer la base de donnée : Databases -> ajouter une base de donnée sous le nom "parking" -> create
+4-  Créer la base de donnée : Databases -> ajouter une base de donnée sous le nom "parking" -> create.
 
-5-  Importer le shéma de la base : Import -> Browse.. -> Séléctionner le fichier parking.sql -> Go
+5-  Importer le shéma de la base : Import -> Browse.. -> Séléctionner le fichier parking.sql -> Go.
 
 La base de données est mise en place.
 
