@@ -2,12 +2,12 @@
 
 ## Manuel d'utilisation
 
-### 1ère étape: cloner le projet et l'ouvrir avec android studio :
+### 1ère étape: Cloner le projet et l'ouvrir avec android studio :
 
 1-  Installer Android Studio
 2-  New project from Version Control -> Git -> saisir le lien git du projet
 
-### 2ème étape: mise en place du serveur :
+### 2ème étape: Mise en place du serveur :
 
 1-  Installer le logiciel WAMP
 
@@ -21,7 +21,7 @@
 
 La base de données est mise en place.
 
-### 3ème étape: configurations :
+### 3ème étape: Configurations :
 
 1-  Dans le fichier "BackendAPI.java", modifier la valeur de la variable "IP" en la remplacant par votre ip public.
 
