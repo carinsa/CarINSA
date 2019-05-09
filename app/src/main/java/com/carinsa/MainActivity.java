@@ -543,7 +543,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     }
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-                    Parking p = bapi.getClosestAvailableParking(coords[0], coords[1], 1000);
+                    Parking p = bapi.getClosestAvailableParking(coords[0], coords[1], 100);
                     IMapController mapController = map.getController();
                     if(p == null)
                     {
@@ -716,7 +716,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Log.e("type Parking", Integer.toString(typeParkingSelected));
                 Log.e("prix Parking", Boolean.toString(prixParkingSelected));
                 Log.e("taille Parking", Integer.toString(tailleParkingSelected));
-                Parking p = bapi.getClosestAvailableParking(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1000);
+                Parking p = bapi.getClosestAvailableParking(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 100);
 
                 if(p==null){
                     bapi.addSpot(mLastLocation.getLatitude(), mLastLocation.getLongitude(), typeParkingSelected, prixParkingSelected, tailleParkingSelected);
