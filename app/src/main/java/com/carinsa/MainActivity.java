@@ -340,14 +340,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
-        //marker starter
-        GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
-        Marker startMarker = new Marker(map);
-        startMarker.setPosition(startPoint);
+
 
 
         //startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);// position the marker in center
-        map.getOverlays().add(startMarker);
         CompassOverlay compassOverlay = new CompassOverlay(this, map);
         compassOverlay.enableCompass();
         map.getOverlays().add(compassOverlay);
